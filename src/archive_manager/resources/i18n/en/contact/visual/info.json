@@ -1,0 +1,11 @@
+{
+    "INFO_NO_CONTACTS": {
+        "message": "No contacts registered yet."
+    },
+    "INFO_SEARCH_CONTACT": {
+        "message": "Search for the contact you want to select"
+    },
+    "INFO_MULTIPLE_RESULTS": {
+        "message": "Multiple results found"
+    }
+}

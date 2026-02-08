@@ -1,0 +1,42 @@
+{
+    "INVALID_INPUT": {
+        "message": "The provided input is not valid",
+        "http_status": 400
+    },
+    "INVALID_INTEGER_INPUT": {
+        "message": "You must enter a valid integer",
+        "http_status": 400
+    },
+    "INVALID_LANGUAGE": {
+        "message": "Invalid language: '{language}'",
+        "http_status": 400
+    },
+    "MENU_NOT_FOUND": {
+        "message": "Menu not found: [{missing_menu}] in language [{language}]",
+        "http_status": 500
+    },
+    "TABLE_NOT_FOUND": {
+        "message": "Table not found: [{missing_table}] in language [{language}]",
+        "http_status": 500
+    },
+    "OPERATION_FAILED": {
+        "message": "The operation could not be completed",
+        "http_status": 500
+    },
+    "PERSISTENCE_ERROR": {
+        "message": "Data access error {message}",
+        "http_status": 500
+    },
+    "UNKNOWN_ERROR": {
+        "message": "An unexpected error occurred",
+        "http_status": 500
+    },
+    "INVALID_MENU_CHOICE": {
+        "message": "Invalid menu option",
+        "http_status": 400
+    },
+    "MESSAGE_NOT_FOUND": {
+        "message": "Message not found: [{missing_code}] in language [{language}]",
+        "http_status": 500
+    }
+}

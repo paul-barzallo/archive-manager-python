@@ -1,0 +1,19 @@
+# Archive Manager Python - Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Include production dependencies
+-r requirements.txt
+
+# Testing
+pytest>=8.0.0
+pytest-cov>=4.0.0
+
+# Linting and formatting
+ruff>=0.6.0
+mypy>=1.10.0
+
+# Pre-commit hooks
+pre-commit>=3.7.0
+
+# Type stubs
+types-PyYAML>=6.0.0

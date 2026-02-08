@@ -1,0 +1,11 @@
+{
+    "CONFIRM_DELETE_CONTACT": {
+        "message": "Are you sure you want to delete this contact?"
+    },
+    "YES": {
+        "message": "Yes"
+    },
+    "NO": {
+        "message": "No"
+    }
+}

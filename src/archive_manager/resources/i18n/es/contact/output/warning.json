@@ -1,0 +1,14 @@
+{
+    "DELETE_NOT_FOUND": {
+        "message": "El contacto ya no existía",
+        "http_status": 202
+    },
+    "EMPTY_CONTACT_LIST": {
+        "message": "No hay contactos registrados aún",
+        "http_status": 200
+    },
+    "CONTACT_NOT_FOUND": {
+        "message": "Contacto no encontrado",
+        "http_status": 200
+    }
+}

@@ -1,0 +1,56 @@
+{
+    "HEADER_ADD_CONTACT": {
+        "message": "═══ Añadir Nuevo Contacto ═══"
+    },
+    "HEADER_EDIT_CONTACT": {
+        "message": "═══ Modificar Contacto ═══"
+    },
+    "HEADER_DELETE_CONTACT": {
+        "message": "═══ Eliminar Contacto ═══"
+    },
+    "HEADER_SEARCH_CONTACT": {
+        "message": "═══ Buscar Contacto ═══"
+    },
+    "TITLE_CONTACT_LIST": {
+        "message": "Lista de Contactos"
+    },
+    "TITLE_CONTACT_CREATED": {
+        "message": "Contacto Creado"
+    },
+    "TITLE_CONTACT_UPDATED": {
+        "message": "Contacto Actualizado"
+    },
+    "TITLE_CONTACT_TO_EDIT": {
+        "message": "Contacto a Modificar"
+    },
+    "TITLE_CONTACT_TO_DELETE": {
+        "message": "Contacto a Eliminar"
+    },
+    "TITLE_CONTACT_DETAILS": {
+        "message": "Detalles del Contacto"
+    },
+    "TITLE_SEARCH_RESULTS": {
+        "message": "Resultados de Búsqueda"
+    },
+    "TITLE_CONTACT_FOUND": {
+        "message": "Contacto Encontrado"
+    },
+    "TITLE_MULTIPLE_RESULTS": {
+        "message": "Múltiples Resultados"
+    },
+    "DETAIL_ID": {
+        "message": "ID"
+    },
+    "DETAIL_FIRST_NAME": {
+        "message": "Nombre"
+    },
+    "DETAIL_LAST_NAME": {
+        "message": "Apellido"
+    },
+    "DETAIL_PHONE": {
+        "message": "Teléfono"
+    },
+    "DETAIL_EMAIL": {
+        "message": "Email"
+    }
+}

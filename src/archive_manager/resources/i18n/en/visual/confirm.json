@@ -1,0 +1,11 @@
+{
+    "CONFIRM_EXIT": {
+        "message": "Are you sure you want to exit?"
+    },
+    "YES": {
+        "message": "Yes"
+    },
+    "NO": {
+        "message": "No"
+    }
+}

@@ -1,0 +1,86 @@
+{
+    "FIRST_OR_LAST_REQUIRED": {
+        "message": "Debe proporcionar al menos un nombre o un apellido",
+        "http_status": 400
+    },
+    "FIRST_NAME_REQUIRED": {
+        "message": "El nombre no puede estar vacío",
+        "http_status": 400
+    },
+    "LAST_NAME_REQUIRED": {
+        "message": "El apellido no puede estar vacío",
+        "http_status": 400
+    },
+    "EMAIL_REQUIRED": {
+        "message": "El email no puede estar vacío",
+        "http_status": 400
+    },
+    "PHONE_REQUIRED": {
+        "message": "El número de teléfono no puede estar vacío",
+        "http_status": 400
+    },
+    "MAX_NAME_LENGTH": {
+        "message": "El nombre excede la longitud máxima de 100 caracteres",
+        "http_status": 400
+    },
+    "MIN_NAME_LENGTH": {
+        "message": "El nombre debe tener al menos 2 caracteres",
+        "http_status": 400
+    },
+    "MAX_LAST_NAME_LENGTH": {
+        "message": "El apellido excede la longitud máxima de 100 caracteres",
+        "http_status": 400
+    },
+    "MIN_LAST_NAME_LENGTH": {
+        "message": "El apellido debe tener al menos 2 caracteres",
+        "http_status": 400
+    },
+    "MAX_EMAIL_LENGTH": {
+        "message": "El email excede la longitud máxima de 254 caracteres",
+        "http_status": 400
+    },
+    "MIN_PHONE_DIGITS": {
+        "message": "El n\u00famero de tel\u00e9fono debe contener al menos 7 d\u00edgitos",
+        "http_status": 400
+    },
+    "MAX_PHONE_DIGITS": {
+        "message": "El n\u00famero de tel\u00e9fono no puede exceder 15 d\u00edgitos",
+        "http_status": 400
+    },
+    "INVALID_FULL_NAME": {
+        "message": "Nombre completo no válido",
+        "http_status": 400
+    },
+    "INVALID_FIRST_NAME": {
+        "message": "Nombre no válido",
+        "http_status": 400
+    },
+    "INVALID_LAST_NAME": {
+        "message": "Apellido no válido",
+        "http_status": 400
+    },
+    "INVALID_EMAIL": {
+        "message": "Email no válido",
+        "http_status": 400
+    },
+    "INVALID_PHONE": {
+        "message": "Número de teléfono no válido",
+        "http_status": 400
+    },
+    "DUPLICATE_EMAIL": {
+        "message": "El email ya existe: {email}",
+        "http_status": 409
+    },
+    "DUPLICATE_PHONE": {
+        "message": "El teléfono ya existe: {phone}",
+        "http_status": 409
+    },
+    "UPDATE_NOT_FOUND": {
+        "message": "No se pudo actualizar: el contacto no existe",
+        "http_status": 404
+    },
+    "RESTORE_NOT_FOUND": {
+        "message": "No se pudo restaurar: contacto eliminado no encontrado",
+        "http_status": 404
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "TITLE_SUCCESS": {
+        "message": "Success"
+    },
+    "TITLE_ERROR": {
+        "message": "Error"
+    },
+    "TITLE_WARNING": {
+        "message": "Warning"
+    },
+    "TITLE_INFORMATION": {
+        "message": "Information"
+    }
+}

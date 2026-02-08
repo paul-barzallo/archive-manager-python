@@ -1,0 +1,132 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "archive-manager-python"
+version = "0.1.0"
+description = "Contacts manager CLI with SQLite storage and Rich UI"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+dependencies = [
+    # UI
+    "rich>=13.7.0",
+    "InquirerPy>=0.3.4",
+    "decorator>=5.1.1",
+    # Database
+    "SQLAlchemy>=2.0.0",
+    # Configuration
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "PyYAML>=6.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+    # Linting and formatting
+    "ruff>=0.6.0",
+    "mypy>=1.10.0",
+    # Pre-commit hooks
+    "pre-commit>=3.7.0",
+    # Type stubs
+    "types-PyYAML>=6.0.0",
+]
+
+[project.scripts]
+archive-manager = "archive_manager.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"archive_manager" = [
+    "resources/**/*.json",
+    "infrastructure/persistence/db/scripts/*.sql",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--strict-markers",
+    "--tb=short",
+    "--color=yes",
+]
+markers = [
+    "unit: Unit tests for isolated components",
+    "integration: Integration tests across layers",
+    "slow: Tests that take significant time to run",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", "I", "N", "UP", "B", "C4", "SIM",
+    "RUF",
+    "TRY", "RET", "RSE", "ERA",
+    "DTZ",
+    "PERF", "PTH", "FURB",
+    "S",
+    "D",
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# S101: assert is used intentionally in tests
+"tests/**/*.py" = ["S101"]
+# N818: Exception names are intentionally named for semantics
+"src/archive_manager/core/errors.py" = ["N818"]
+# S605: Shell command is safe (only cls/clear)
+"src/archive_manager/adapters/cli/ui/csl_ui.py" = ["S605"]
+# TRY301: Abstract raise is common pattern in repository layer
+"src/archive_manager/infrastructure/persistence/sqlite_contact_repository.py" = ["TRY301"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "decorator"
+follow_untyped_imports = true
+
+[tool.markdownlint]
+MD033 = false
+
+

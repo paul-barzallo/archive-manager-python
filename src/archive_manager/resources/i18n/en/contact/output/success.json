@@ -1,0 +1,14 @@
+{
+    "SUCCESS_CONTACT_CREATED": {
+        "message": "Contact successfully created",
+        "http_status": 201
+    },
+    "SUCCESS_CONTACT_UPDATED": {
+        "message": "Contact successfully updated",
+        "http_status": 200
+    },
+    "SUCCESS_CONTACT_DELETED": {
+        "message": "Contact successfully deleted",
+        "http_status": 200
+    }
+}

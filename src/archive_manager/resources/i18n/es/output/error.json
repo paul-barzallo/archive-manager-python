@@ -1,0 +1,42 @@
+{
+    "INVALID_INPUT": {
+        "message": "La entrada proporcionada no es válida",
+        "http_status": 400
+    },
+    "INVALID_INTEGER_INPUT": {
+        "message": "Debe ingresar un número entero válido",
+        "http_status": 400
+    },
+    "INVALID_LANGUAGE": {
+        "message": "Idioma inválido: '{language}'",
+        "http_status": 400
+    },
+    "MENU_NOT_FOUND": {
+        "message": "Menú no encontrado: [{missing_menu}] en idioma [{language}]",
+        "http_status": 500
+    },
+    "TABLE_NOT_FOUND": {
+        "message": "Tabla no encontrada: [{missing_table}] en idioma [{language}]",
+        "http_status": 500
+    },
+    "OPERATION_FAILED": {
+        "message": "La operación no se pudo completar",
+        "http_status": 500
+    },
+    "PERSISTENCE_ERROR": {
+        "message": "Error al acceder a los datos {message}",
+        "http_status": 500
+    },
+    "UNKNOWN_ERROR": {
+        "message": "Ha ocurrido un error inesperado",
+        "http_status": 500
+    },
+    "INVALID_MENU_CHOICE": {
+        "message": "Opción de menú inválida",
+        "http_status": 400
+    },
+    "MESSAGE_NOT_FOUND": {
+        "message": "Mensaje no encontrado: [{missing_code}] en idioma [{language}]",
+        "http_status": 500
+    }
+}

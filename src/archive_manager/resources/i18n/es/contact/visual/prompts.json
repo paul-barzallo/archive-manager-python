@@ -1,0 +1,38 @@
+{
+    "PROMPT_FIRST_NAME": {
+        "message": "Nombre"
+    },
+    "PROMPT_LAST_NAME": {
+        "message": "Apellido"
+    },
+    "PROMPT_EMAIL": {
+        "message": "Email"
+    },
+    "PROMPT_PHONE": {
+        "message": "Teléfono (opcional)"
+    },
+    "PROMPT_NEW_FIRST_NAME": {
+        "message": "Nuevo nombre"
+    },
+    "PROMPT_NEW_LAST_NAME": {
+        "message": "Nuevo apellido"
+    },
+    "PROMPT_NEW_EMAIL": {
+        "message": "Nuevo email"
+    },
+    "PROMPT_NEW_PHONE": {
+        "message": "Nuevo teléfono"
+    },
+    "PROMPT_SEARCH_FULL_NAME": {
+        "message": "Nombre Completo"
+    },
+    "PROMPT_SEARCH_EMAIL": {
+        "message": "Email del contacto a buscar"
+    },
+    "PROMPT_SEARCH_PHONE": {
+        "message": "Teléfono del contacto a buscar"
+    },
+    "PROMPT_CONTACT_ID": {
+        "message": "Ingrese el ID del contacto"
+    }
+}

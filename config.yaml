@@ -1,0 +1,34 @@
+# Archive Manager Configuration
+# =============================
+# This file contains the default configuration for the application.
+
+# Application settings
+app_name: archive-manager
+version: "0.1.0"
+debug: false
+environment: development  # development, testing, production
+
+# Database configuration
+database:
+  # SQLite connection URL (use sqlite:///:memory: for in-memory)
+  url: "sqlite:///data/db/archive-manager.sqlite"
+  # Connection pool settings
+  pool_size: 5
+  max_overflow: 10
+  pool_recycle: 3600  # seconds
+  echo: false  # Set to true for SQL query logging
+
+# Logging configuration
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: INFO
+  # Directory for log files (relative to project root)
+  dir: "data/logs"
+  # Log message format
+  format: "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+
+# Internationalization
+i18n:
+  # language (ISO 639-1 code)
+  language: es

@@ -1,0 +1,11 @@
+{
+    "CONFIRM_DELETE_CONTACT": {
+        "message": "¿Está seguro que desea eliminar este contacto?"
+    },
+    "YES": {
+        "message": "Sí"
+    },
+    "NO": {
+        "message": "No"
+    }
+}

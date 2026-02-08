@@ -1,0 +1,14 @@
+# Archive Manager Python - Production Dependencies
+# Generated from pyproject.toml
+# Install with: pip install -r requirements.txt
+
+# Core dependencies
+rich>=13.7.0
+InquirerPy>=0.3.4
+decorator>=5.1.1
+SQLAlchemy>=2.0.0
+
+# Configuration
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+PyYAML>=6.0.0

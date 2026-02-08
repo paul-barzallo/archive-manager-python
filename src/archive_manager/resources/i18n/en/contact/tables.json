@@ -1,0 +1,12 @@
+{
+    "contact_table": {
+        "title": "",
+        "headers": {
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "email": "Email",
+            "phone": "Phone"
+        },
+        "footer": "Total: {count} contact(s)"
+    }
+}

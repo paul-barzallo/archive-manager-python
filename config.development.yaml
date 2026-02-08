@@ -1,0 +1,18 @@
+# Development Environment Configuration
+# ======================================
+# This file contains development-specific overrides.
+# Values here are merged with config.yaml (base configuration).
+# Only include settings that differ from the base config.
+
+# Enable debug mode for development
+debug: true
+
+# Database configuration
+database:
+  # Enable SQL query logging for debugging
+  echo: true
+
+# Logging configuration
+logging:
+  # More verbose logging for development
+  level: DEBUG

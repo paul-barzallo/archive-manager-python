@@ -1,0 +1,38 @@
+{
+    "PROMPT_FIRST_NAME": {
+        "message": "First Name"
+    },
+    "PROMPT_LAST_NAME": {
+        "message": "Last Name"
+    },
+    "PROMPT_EMAIL": {
+        "message": "Email"
+    },
+    "PROMPT_PHONE": {
+        "message": "Phone (optional)"
+    },
+    "PROMPT_NEW_FIRST_NAME": {
+        "message": "New first name"
+    },
+    "PROMPT_NEW_LAST_NAME": {
+        "message": "New last name"
+    },
+    "PROMPT_NEW_EMAIL": {
+        "message": "New email"
+    },
+    "PROMPT_NEW_PHONE": {
+        "message": "New phone"
+    },
+    "PROMPT_SEARCH_FULL_NAME": {
+        "message": "Full name"
+    },
+    "PROMPT_SEARCH_EMAIL": {
+        "message": "Email of the contact to search"
+    },
+    "PROMPT_SEARCH_PHONE": {
+        "message": "Phone of the contact to search"
+    },
+    "PROMPT_CONTACT_ID": {
+        "message": "Enter the contact ID"
+    }
+}

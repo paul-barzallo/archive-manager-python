@@ -1,0 +1,56 @@
+{
+    "HEADER_ADD_CONTACT": {
+        "message": "═══ Add New Contact ═══"
+    },
+    "HEADER_EDIT_CONTACT": {
+        "message": "═══ Edit Contact ═══"
+    },
+    "HEADER_DELETE_CONTACT": {
+        "message": "═══ Delete Contact ═══"
+    },
+    "HEADER_SEARCH_CONTACT": {
+        "message": "═══ Search Contact ═══"
+    },
+    "TITLE_CONTACT_LIST": {
+        "message": "Contact List"
+    },
+    "TITLE_CONTACT_CREATED": {
+        "message": "Contact Created"
+    },
+    "TITLE_CONTACT_UPDATED": {
+        "message": "Contact Updated"
+    },
+    "TITLE_CONTACT_TO_EDIT": {
+        "message": "Contact to Edit"
+    },
+    "TITLE_CONTACT_TO_DELETE": {
+        "message": "Contact to Delete"
+    },
+    "TITLE_CONTACT_DETAILS": {
+        "message": "Contact Details"
+    },
+    "TITLE_SEARCH_RESULTS": {
+        "message": "Search Results"
+    },
+    "TITLE_CONTACT_FOUND": {
+        "message": "Contact Found"
+    },
+    "TITLE_MULTIPLE_RESULTS": {
+        "message": "Multiple Results"
+    },
+    "DETAIL_ID": {
+        "message": "ID"
+    },
+    "DETAIL_FIRST_NAME": {
+        "message": "First Name"
+    },
+    "DETAIL_LAST_NAME": {
+        "message": "Last Name"
+    },
+    "DETAIL_PHONE": {
+        "message": "Phone"
+    },
+    "DETAIL_EMAIL": {
+        "message": "Email"
+    }
+}

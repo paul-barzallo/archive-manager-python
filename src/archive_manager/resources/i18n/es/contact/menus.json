@@ -1,0 +1,74 @@
+{
+    "contact_list_menu": {
+        "title": "Seleccione una de las opciones:",
+        "options": [
+            {
+                "id": "add",
+                "text": "Añadir contacto"
+            },
+            {
+                "id": "find",
+                "text": "Buscar contacto"
+            },
+            {
+                "id": "list",
+                "text": "Listar contactos"
+            },
+            {
+                "id": "exit",
+                "text": "Salir"
+            }
+        ]
+    },
+    "find_contact_menu": {
+        "title": "¿Desea buscar el contacto por nombre y apellido o por email?",
+        "options": [
+            {
+                "id": "full_name",
+                "text": "Nombre y apellido."
+            },
+            {
+                "id": "email",
+                "text": "Email."
+            },
+            {
+                "id": "phone",
+                "text": "Teléfono."
+            },
+            {
+                "id": "return",
+                "text": "Volver."
+            }
+        ]
+    },
+    "select_contact_menu": {
+        "title": "Seleccione el contacto:",
+        "options": [
+            {
+                "id": "return",
+                "text": "Volver"
+            }
+        ]
+    },
+    "contact_menu": {
+        "title": "Seleccione una de las opciones:",
+        "options": [
+            {
+                "id": "view",
+                "text": "Ver contacto"
+            },
+            {
+                "id": "edit",
+                "text": "Modificar contacto"
+            },
+            {
+                "id": "del",
+                "text": "Eliminar contacto"
+            },
+            {
+                "id": "return",
+                "text": "Volver"
+            }
+        ]
+    }
+}

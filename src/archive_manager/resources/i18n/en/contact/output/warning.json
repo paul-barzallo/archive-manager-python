@@ -1,0 +1,14 @@
+{
+    "DELETE_NOT_FOUND": {
+        "message": "Contact already deleted",
+        "http_status": 202
+    },
+    "EMPTY_CONTACT_LIST": {
+        "message": "No contacts registered yet",
+        "http_status": 200
+    },
+    "CONTACT_NOT_FOUND": {
+        "message": "Contact not found",
+        "http_status": 200
+    }
+}

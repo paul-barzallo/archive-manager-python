@@ -1,0 +1,86 @@
+{
+    "FIRST_OR_LAST_REQUIRED": {
+        "message": "You must provide at least a first name or a last name",
+        "http_status": 400
+    },
+    "FIRST_NAME_REQUIRED": {
+        "message": "First name cannot be empty",
+        "http_status": 400
+    },
+    "LAST_NAME_REQUIRED": {
+        "message": "Last name cannot be empty",
+        "http_status": 400
+    },
+    "EMAIL_REQUIRED": {
+        "message": "Email cannot be empty",
+        "http_status": 400
+    },
+    "PHONE_REQUIRED": {
+        "message": "Phone number cannot be empty",
+        "http_status": 400
+    },
+    "MAX_NAME_LENGTH": {
+        "message": "Name exceeds maximum length of 100 characters",
+        "http_status": 400
+    },
+    "MIN_NAME_LENGTH": {
+        "message": "Name must be at least 2 characters long",
+        "http_status": 400
+    },
+    "MAX_LAST_NAME_LENGTH": {
+        "message": "Last name exceeds maximum length of 100 characters",
+        "http_status": 400
+    },
+    "MIN_LAST_NAME_LENGTH": {
+        "message": "Last name must be at least 2 characters long",
+        "http_status": 400
+    },
+    "MAX_EMAIL_LENGTH": {
+        "message": "Email exceeds maximum length of 254 characters",
+        "http_status": 400
+    },
+    "MIN_PHONE_DIGITS": {
+        "message": "Phone number must contain at least 7 digits",
+        "http_status": 400
+    },
+    "MAX_PHONE_DIGITS": {
+        "message": "Phone number cannot exceed 15 digits",
+        "http_status": 400
+    },
+    "INVALID_FULL_NAME": {
+        "message": "Invalid full name",
+        "http_status": 400
+    },
+    "INVALID_FIRST_NAME": {
+        "message": "Invalid first name",
+        "http_status": 400
+    },
+    "INVALID_LAST_NAME": {
+        "message": "Invalid last name",
+        "http_status": 400
+    },
+    "INVALID_EMAIL": {
+        "message": "Invalid email address",
+        "http_status": 400
+    },
+    "INVALID_PHONE": {
+        "message": "Invalid phone number",
+        "http_status": 400
+    },
+    "DUPLICATE_EMAIL": {
+        "message": "Email already exists: {email}",
+        "http_status": 409
+    },
+    "DUPLICATE_PHONE": {
+        "message": "Phone number already exists: {phone}",
+        "http_status": 409
+    },
+    "UPDATE_NOT_FOUND": {
+        "message": "Could not update: contact does not exist",
+        "http_status": 404
+    },
+    "RESTORE_NOT_FOUND": {
+        "message": "Could not restore: deleted contact not found",
+        "http_status": 404
+    }
+}

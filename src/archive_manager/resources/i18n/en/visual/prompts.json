@@ -1,0 +1,8 @@
+{
+    "PROMPT_SELECT_OPTION": {
+        "message": "Select an option"
+    },
+    "PROMPT_PRESS_ENTER": {
+        "message": "Press Enter to continue..."
+    }
+}

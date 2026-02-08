@@ -1,0 +1,14 @@
+{
+    "SEARCH_EMPTY_RESULT": {
+        "message": "No results found",
+        "http_status": 204
+    },
+    "WARN_REQUIRED_FIELD": {
+        "message": "This field is required. Please try again.",
+        "http_status": 200
+    },
+    "WARN_INVALID_INTEGER": {
+        "message": "Please enter a valid number",
+        "http_status": 200
+    }
+}
