@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased] - 2026-02-09
+
+### Changed
+
+- **Paginated contact list**: `list_contacts` now applies a bounded limit
+  (default and maximum: 20) with offset-based paging metadata.
+- **List navigation**: Contact listing supports page navigation when
+  there are more than 10 contacts in total.
+- **Table footer metadata**: Contact table footer now shows current page,
+  total pages, and displayed range (for example, `Page 2 of 3 - from 21 to 40 of 52`).
+- **i18n caching behavior**: `I18nMenus` and `I18nTables` return defensive
+  copies of cached typed objects; loader classes keep raw JSON cache access.
+- **DTO boundary**: `ContactPageDTO` is now defined in the application DTO
+  module and shared by adapters.
 
 ## [0.1.0] - 2026-02-08
 
@@ -53,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Development and Testing
 
-- **236 pytest tests** organised by layer (unit and integration).
+- **248 pytest tests** organised by layer (unit and integration).
 - **In-memory SQLite** fixtures for fast, isolated test execution.
 - **i18n synchronisation tests** for cross-language key consistency.
 - **Import structure tests** for dependency rule compliance.

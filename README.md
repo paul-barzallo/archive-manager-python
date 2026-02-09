@@ -1,4 +1,4 @@
-﻿# Archive Manager
+# Archive Manager
 
 <p align="left">
   <a href="https://www.python.org/downloads/">
@@ -24,6 +24,7 @@ with a structure designed to grow into additional domains over time.
 | Area | Highlights |
 | ---- | ---------- |
 | Contact workflows | Create, read, update, soft-delete, and search by name, email, or phone |
+| Listing and pagination | Contact list uses a bounded limit (default and max: 20), footer metadata (`page/pages` and `from-to/total`), and next/previous navigation when total results are greater than 10 |
 | Duplicate prevention | Phone canonicalization detects equivalent formats (for example, `+34 600 000 000` and `+34600000000`) |
 | Internationalization | English and Spanish resources for prompts, menus, and outputs |
 | Architecture | Clean Architecture, protocol-based interfaces, and dependency injection |

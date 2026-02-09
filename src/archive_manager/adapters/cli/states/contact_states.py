@@ -41,7 +41,6 @@ class MainContactMenuState(BaseState):
             Next state or `None` to exit.
         """
         ui = ctx.ui
-        controller = ctx.controller
         lang = ctx.session.language
 
         option_id = ui.show_contact_list_menu(lang)
@@ -52,10 +51,7 @@ class MainContactMenuState(BaseState):
             return self
 
         if option_id == "list":
-            contacts = controller.list_contacts()
-            ui.show_contacts_table(lang, contacts)
-            ui.pause(lang)
-            return self
+            return _ListContactsState()
 
         if option_id == "find":
             return _FindMenuState()
@@ -147,6 +143,58 @@ class _FindMenuState(BaseState):
             return MainContactMenuState()
 
         return self
+
+
+@dataclass
+class _ListContactsState(BaseState):
+    """State for listing contacts with pagination support.
+
+    Uses offset-based paging with a default page size of 20. Interactive
+    pagination actions are shown only when total results are greater than 10.
+    """
+
+    offset: int = 0
+    limit: int = 20
+    pagination_threshold: int = 10
+
+    @BaseState.handle_errors
+    def run(self, ctx: ContactContext) -> BaseState | None:
+        """Render paginated contact list and handle page navigation.
+
+        The table footer shows current page, total pages, and item range.
+        """
+        ui = ctx.ui
+        controller = ctx.controller
+        lang = ctx.session.language
+
+        page = controller.list_contacts(limit=self.limit, offset=self.offset)
+        ui.show_contacts_table(
+            lang,
+            page.contacts,
+            total=page.total,
+            limit=page.limit,
+            offset=page.offset,
+        )
+
+        if page.total <= self.pagination_threshold:
+            ui.pause(lang)
+            return MainContactMenuState()
+
+        option_id = ui.show_contact_list_pagination_menu(
+            language=lang,
+            has_previous=page.has_previous,
+            has_next=page.has_next,
+        )
+
+        if option_id == "next" and page.has_next:
+            self.offset += page.limit
+            return self
+
+        if option_id == "previous" and page.has_previous:
+            self.offset = max(0, self.offset - page.limit)
+            return self
+
+        return MainContactMenuState()
 
 
 @dataclass

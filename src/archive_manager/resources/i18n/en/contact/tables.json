@@ -7,6 +7,6 @@
             "email": "Email",
             "phone": "Phone"
         },
-        "footer": "Total: {count} contact(s)"
+        "footer": "Page {page} of {pages} · from {start} to {end} of {total}"
     }
 }

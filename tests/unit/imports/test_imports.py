@@ -85,9 +85,10 @@ class TestApplicationImports:
 
     def test_dto_import(self) -> None:
         """Test DTO module exports."""
-        from archive_manager.application.dto import ContactDTO
+        from archive_manager.application.dto import ContactDTO, ContactPageDTO
 
         assert ContactDTO is not None
+        assert ContactPageDTO is not None
 
 
 class TestInfrastructureImports:

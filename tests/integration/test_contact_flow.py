@@ -91,11 +91,63 @@ class TestContactCreationFlow:
             ctrl.add_contact(dto)
 
         # List all contacts
-        all_contacts = ctrl.list_contacts()
+        page = ctrl.list_contacts()
 
-        assert len(all_contacts) == 3
-        emails = {c.email for c in all_contacts}
+        assert len(page.contacts) == 3
+        emails = {c.email for c in page.contacts}
         assert emails == {"ana@example.com", "bob@example.com", "carlos@example.com"}
+
+    def test_list_contacts_uses_default_limit_and_offset(self, integration_stack):
+        """Test controller exposes page counters and item ranges."""
+        ctrl, _, _, _ = integration_stack
+
+        for i in range(52):
+            ctrl.add_contact(
+                ContactDTO(
+                    0,
+                    "Name",
+                    "User",
+                    f"user{i}@example.com",
+                    f"6{i + 1000000000}",
+                )
+            )
+
+        first_page = ctrl.list_contacts()
+        second_page = ctrl.list_contacts(offset=20)
+        third_page = ctrl.list_contacts(offset=40)
+
+        assert first_page.total == 52
+        assert first_page.limit == 20
+        assert first_page.offset == 0
+        assert first_page.shown == 20
+        assert first_page.current_page == 1
+        assert first_page.total_pages == 3
+        assert first_page.start_item == 1
+        assert first_page.end_item == 20
+        assert first_page.has_next is True
+        assert first_page.has_previous is False
+
+        assert second_page.total == 52
+        assert second_page.limit == 20
+        assert second_page.offset == 20
+        assert second_page.shown == 20
+        assert second_page.current_page == 2
+        assert second_page.total_pages == 3
+        assert second_page.start_item == 21
+        assert second_page.end_item == 40
+        assert second_page.has_next is True
+        assert second_page.has_previous is True
+
+        assert third_page.total == 52
+        assert third_page.limit == 20
+        assert third_page.offset == 40
+        assert third_page.shown == 12
+        assert third_page.current_page == 3
+        assert third_page.total_pages == 3
+        assert third_page.start_item == 41
+        assert third_page.end_item == 52
+        assert third_page.has_next is False
+        assert third_page.has_previous is True
 
 
 @pytest.mark.integration
@@ -233,8 +285,8 @@ class TestContactDeleteFlow:
         assert restored.email == "john@example.com"
 
         # Contact should appear in list again
-        all_contacts = ctrl.list_contacts()
-        assert len(all_contacts) == 1
+        page = ctrl.list_contacts()
+        assert len(page.contacts) == 1
 
 
 # ==============================================================================

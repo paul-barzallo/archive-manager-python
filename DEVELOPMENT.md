@@ -1,4 +1,4 @@
-﻿# Development Guide
+# Development Guide
 
 This document describes the development environment setup, project
 conventions, and workflows for contributing to the project.
@@ -59,6 +59,15 @@ Tests are organised by layer under `tests/`:
 
 Integration tests use an in-memory SQLite database for fast, isolated
 execution.
+
+Contact module behaviors covered by tests include:
+
+- Create contact.
+- Read and display contact detail.
+- Update and soft-delete contact.
+- Search by name, email, and phone.
+- List contacts with bounded pagination (`limit` default/max: 20), including
+  page counters and visible range metadata.
 
 ## Linting and Formatting
 
@@ -216,6 +225,14 @@ modifying a message key:
 1. Update the key in every language directory (`en/`, `es/`).
 2. Run `python -m pytest tests/unit/i18n/test_i18n_sync.py` to verify
    consistency.
+
+Caching and mutation rules:
+
+- `I18nMessageLoader`, `I18nMenusLoader`, and `I18nTablesLoader` cache raw
+  JSON dictionaries by file path.
+- `I18nMenus` and `I18nTables` return defensive deep copies of typed objects
+  (`I18nMenu` / `I18nTable`), so UI layers can safely mutate options/headers
+  without contaminating shared cache state.
 
 ## Local Data
 

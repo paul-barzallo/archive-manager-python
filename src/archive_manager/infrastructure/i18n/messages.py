@@ -149,7 +149,7 @@ class I18nMessages:
             if (file_path_global, code) in cls.__cache:
                 return cls.__cache[(file_path_global, code)]
 
-            # Fallback chain: service → global → default-service → default-global
+            # Fallback chain: service -> global -> default-service -> default-global
             candidates: list[Path] = [file_path]
             if cls._SERVICE:
                 candidates.append(file_path_global)
@@ -226,3 +226,4 @@ class ContactI18nMessages(I18nMessages):
     """Messages scoped to the contact service."""
 
     _SERVICE: ClassVar[str] = SERVICES.CONTACT
+

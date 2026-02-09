@@ -2,7 +2,7 @@
 """Console controller for contact management application.
 
 Provides business logic operations for contacts, delegating to ContactService.
-Does not handle UI or state machine — those are orchestrated by cli.py.
+Does not handle UI or state machine; those are orchestrated by cli.py.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ import logging
 from collections.abc import Sequence
 
 from archive_manager.adapters.cli.base_controller import BaseCslController
-from archive_manager.application.dto import ContactDTO
+from archive_manager.application.dto import ContactDTO, ContactPageDTO
 from archive_manager.application.services import ContactService
 
 logger = logging.getLogger(__name__)
@@ -44,10 +44,24 @@ class ContactCslController(BaseCslController[ContactService]):
         )
         return ContactDTO.from_entity(contact)
 
-    def list_contacts(self) -> Sequence[ContactDTO]:
-        """Display all contacts in a table."""
-        contacts = self._service.list_all()
-        return [ContactDTO.from_entity(c) for c in contacts]
+    def list_contacts(self, limit: int = 20, offset: int = 0) -> ContactPageDTO:
+        """List contacts using a bounded paginated response.
+
+        Args:
+            limit: Requested number of returned contacts (max 20).
+            offset: Zero-based index for page start.
+
+        Returns:
+            Paginated page with contact DTOs and metadata.
+        """
+        page = self._service.list_contacts(limit=limit, offset=offset)
+        contacts = [ContactDTO.from_entity(c) for c in page.contacts]
+        return ContactPageDTO(
+            contacts=contacts,
+            total=page.total,
+            limit=page.limit,
+            offset=page.offset,
+        )
 
     def search_contact_by_name(self, full_name: str) -> Sequence[ContactDTO]:
         """Search contacts by full name (partial match).

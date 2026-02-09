@@ -120,6 +120,30 @@ class TestContactI18nMenus:
         assert len(menu.options) > 0
         assert all(opt.id for opt in menu.options)
 
+    def test_pagination_menu_loader_loads_from_json(self) -> None:
+        """Test ContactI18nMenus loads pagination menu definitions."""
+        I18nMenus.clear_cache()
+        menu = ContactI18nMenus.contact_pagination_menu("en")
+
+        assert menu.title != ""
+        assert len(menu.options) == 3
+        assert {opt.id for opt in menu.options} == {"previous", "next", "return"}
+
+    def test_loaded_menu_isolation_from_cache(self) -> None:
+        """Test mutating a loaded menu does not affect later loads."""
+        I18nMenus.clear_cache()
+
+        menu = ContactI18nMenus.contact_pagination_menu("en")
+        menu.clear_options()
+
+        fresh_menu = ContactI18nMenus.contact_pagination_menu("en")
+        assert len(fresh_menu.options) == 3
+        assert {opt.id for opt in fresh_menu.options} == {
+            "previous",
+            "next",
+            "return",
+        }
+
 
 class TestContactI18nTables:
     """Tests for ContactI18nTables loader class."""
@@ -135,3 +159,13 @@ class TestContactI18nTables:
         # Verify table was loaded with expected structure
         assert table.headers is not None
         assert len(table.headers) > 0
+
+    def test_loaded_table_isolation_from_cache(self) -> None:
+        """Test mutating a loaded table does not affect later loads."""
+        I18nTables.clear_cache()
+
+        table = ContactI18nTables.contact_table("en")
+        table.headers.clear()
+
+        fresh_table = ContactI18nTables.contact_table("en")
+        assert len(fresh_table.headers) > 0

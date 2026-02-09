@@ -1,4 +1,4 @@
-﻿# Architecture
+# Architecture
 
 ## Overview
 
@@ -55,6 +55,8 @@ Use-case and business-rule layer. Depends only on `core/`.
   - `policies/ContactPolicy`: Uniqueness rules evaluated before persistence.
 - **`dto/`**
   - `ContactDTO`: Data-transfer object for the controller-service boundary.
+  - `ContactPageDTO`: Paginated list response DTO (`contacts`, `total`,
+    `limit`, `offset`) with derived metadata for consumers.
 
 ### 3. Infrastructure (`infrastructure/`)
 
@@ -86,12 +88,14 @@ Delivery mechanisms. Currently provides a CLI adapter.
 - **`cli/`**
   - `BaseCslController(ABC, Controller, Generic[TService])`: Abstract
     controller base satisfying the `Controller` protocol.
-  - `ContactCslController`: Controller for contact operations.
+  - `ContactCslController`: Controller for contact operations, including
+    bounded paginated listing.
   - `states/BaseState`: State-machine base with `@handle_errors` decorator.
   - `states/contact_states.py`: Concrete states (menus, create, search,
-    edit, delete).
+    edit, delete, list pagination).
   - `ui/CslUI`: Rich-based console UI (menus, tables, prompts).
-  - `ui/ContactCslUI`: Contact-specific UI with i18n integration.
+  - `ui/ContactCslUI`: Contact-specific UI with paginated table footer and
+    list navigation actions.
 
 ## Entity Factory Pattern
 
@@ -154,11 +158,14 @@ State Machine --> Controller --> Service --> Repository --> ORM --> SQLite
 
 - Resources are shipped inside the package under `resources/i18n/<lang>/`.
 - Each language directory contains three subdirectories: `visual/` (prompts,
-  labels), `output/` (error and success messages), and one directory per
+  labels), `output/` (error, warning, and success messages), and one directory per
   service module (e.g. `contact/` for menus and tables).
 - I18n classes (`I18nMessages`, `I18nMenus`, `I18nTables`) are configured
   once at startup via `configure(i18n_settings)` and resolve messages
   through a thread-safe cache.
+- Loader classes cache raw JSON mappings; typed menu/table resolvers return
+  defensive copies of `I18nMenu` and `I18nTable` so dynamic UI mutations do
+  not leak into shared cache state.
 - Log messages are always written in English regardless of the user
   interface language.
 

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Base loaders for i18n JSON files with caching."""
+"""Base loaders for i18n JSON files with caching.
+
+These loaders return raw dictionaries from the shared JSON cache.
+Callers that need mutation-safe objects should use typed resolvers
+(``I18nMenus`` / ``I18nTables``), which provide defensive copies.
+"""
 
 from __future__ import annotations
 
-import copy
 import json
 import logging
 from pathlib import Path
@@ -91,7 +95,10 @@ class I18nMessageLoader(_I18nBaseLoader):
 
 
 class I18nMenusLoader(_I18nBaseLoader):
-    """Loader for menu configuration entries."""
+    """Loader for menu configuration entries.
+
+    Returned dictionaries are cache-backed and should be treated as read-only.
+    """
 
     @classmethod
     def get_i18nmenu(cls, file_path: Path, menu_name: str) -> dict[str, Any] | None:
@@ -112,11 +119,14 @@ class I18nMenusLoader(_I18nBaseLoader):
                 menu_data,
             )
             return None
-        return copy.deepcopy(menu_data) if menu_data else None
+        return menu_data
 
 
 class I18nTablesLoader(_I18nBaseLoader):
-    """Loader for table configuration entries."""
+    """Loader for table configuration entries.
+
+    Returned dictionaries are cache-backed and should be treated as read-only.
+    """
 
     @classmethod
     def get_i18ntable(cls, file_path: Path, table_name: str) -> dict[str, Any] | None:
@@ -137,4 +147,4 @@ class I18nTablesLoader(_I18nBaseLoader):
                 table_data,
             )
             return None
-        return copy.deepcopy(table_data) if table_data else None
+        return table_data

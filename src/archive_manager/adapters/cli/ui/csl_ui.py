@@ -292,26 +292,31 @@ class CslUI:
         self._console.print()
         Prompt.ask(f" [dim]{message} [/dim]", console=self._console, show_default=False)
 
-    def _show_menu(self, menu_config: I18nMenu) -> str:
+    def _show_menu(self, menu_config: I18nMenu, clear_screen: bool = True) -> str:
         """Display a menu and return the selected option ID.
 
         Args:
-            menu_config: MenuConfig instance to display.
+            menu_config: ``I18nMenu`` instance to display.
+            clear_screen: If ``True``, render the banner and clear previous output.
 
         Returns:
             The ID of the selected menu option.
         """
-        self.show_title()
+        if clear_screen:
+            self.show_title()
         return menu_config.prompt_choice(_INQUIRER_STYLE)
 
-    def _show_table(self, table_config: I18nTable, data: Sequence[Any]) -> None:
+    def _show_table(
+        self, table_config: I18nTable, data: Sequence[Any], **kwargs: Any
+    ) -> None:
         """Display a table with the provided data.
 
         Args:
-            table_config: TableConfig instance defining table structure.
+            table_config: ``I18nTable`` instance defining table structure.
             data: Sequence of objects to display in the table.
+            **kwargs: Footer formatting values used by ``I18nTable``.
         """
-        table = table_config.build_table([vars(element) for element in data])
+        table = table_config.build_table([vars(element) for element in data], **kwargs)
         self._console.print()
         self._console.print(Padding(table, (0, 2)))
         self._console.print()

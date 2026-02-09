@@ -247,6 +247,23 @@ class TestContactCslUIMenus:
         assert result == "full_name"
         mock_show_menu.assert_called_once()
 
+    @patch.object(ContactCslUI, "_show_menu")
+    def test_show_contact_list_pagination_menu(
+        self, mock_show_menu: MagicMock, contacts_ui: ContactCslUI
+    ) -> None:
+        """Test pagination menu is displayed without clearing the table."""
+        mock_show_menu.return_value = "next"
+
+        result = contacts_ui.show_contact_list_pagination_menu(
+            language="en",
+            has_previous=False,
+            has_next=True,
+        )
+
+        assert result == "next"
+        call_kwargs = mock_show_menu.call_args.kwargs
+        assert call_kwargs["clear_screen"] is False
+
 
 class TestContactCslUITables:
     """Tests for ContactCslUI table display methods."""
@@ -258,9 +275,40 @@ class TestContactCslUITables:
         contacts_ui: ContactCslUI,
         sample_contacts: Sequence[ContactDTO],
     ) -> None:
-        """Test show_contacts_table calls _show_table."""
+        """Test show_contacts_table passes complete footer pagination metadata."""
         contacts_ui.show_contacts_table("en", sample_contacts)
         mock_show_table.assert_called_once()
+        call_kwargs = mock_show_table.call_args.kwargs
+        assert call_kwargs["shown"] == 2
+        assert call_kwargs["total"] == 2
+        assert call_kwargs["start"] == 1
+        assert call_kwargs["end"] == 2
+        assert call_kwargs["page"] == 1
+        assert call_kwargs["pages"] == 1
+
+    @patch.object(ContactCslUI, "_show_table")
+    def test_show_contacts_table_with_explicit_total(
+        self,
+        mock_show_table: MagicMock,
+        contacts_ui: ContactCslUI,
+        sample_contacts: Sequence[ContactDTO],
+    ) -> None:
+        """Test show_contacts_table computes page and range from limit/offset."""
+        contacts_ui.show_contacts_table(
+            "en",
+            sample_contacts,
+            total=321,
+            limit=20,
+            offset=20,
+        )
+        mock_show_table.assert_called_once()
+        call_kwargs = mock_show_table.call_args.kwargs
+        assert call_kwargs["shown"] == 2
+        assert call_kwargs["total"] == 321
+        assert call_kwargs["start"] == 21
+        assert call_kwargs["end"] == 22
+        assert call_kwargs["page"] == 2
+        assert call_kwargs["pages"] == 17
 
 
 class TestContactCslUIDetails:

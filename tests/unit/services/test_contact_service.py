@@ -87,6 +87,40 @@ def test_list_all_empty_warns(service) -> None:
     assert wi.value.code == "EMPTY_CONTACT_LIST"
 
 
+def test_list_contacts_empty_warns(service) -> None:
+    """Test that paginated list raises warning when empty."""
+    with pytest.raises(AppWarning) as wi:
+        service.list_contacts()
+    assert wi.value.code == "EMPTY_CONTACT_LIST"
+
+
+def test_list_contacts_returns_paginated_page(service) -> None:
+    """Test paginated list returns page metadata and sliced results."""
+    for i in range(3):
+        service.create("Name", "User", f"user{i}@example.com", f"60000000{i}")
+
+    page = service.list_contacts(limit=2, offset=1)
+
+    assert page.total == 3
+    assert page.limit == 2
+    assert page.offset == 1
+    assert len(page.contacts) == 2
+    assert page.contacts[0].email == "user1@example.com"
+    assert page.contacts[1].email == "user2@example.com"
+
+
+def test_list_contacts_clamps_limit_to_max(service) -> None:
+    """Test list_contacts enforces max limit of 20 results."""
+    for i in range(25):
+        service.create("Name", "User", f"user{i}@example.com", f"7000000{i:02d}")
+
+    page = service.list_contacts(limit=100)
+
+    assert page.total == 25
+    assert page.limit == 20
+    assert len(page.contacts) == 20
+
+
 def test_update_contact_prevents_duplicate_email(service) -> None:
     """Test that update prevents duplicate email."""
     ana = service.create("Ana", "Lopez", "ana@example.com", "600000000")
