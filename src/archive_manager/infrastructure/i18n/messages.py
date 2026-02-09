@@ -226,4 +226,3 @@ class ContactI18nMessages(I18nMessages):
     """Messages scoped to the contact service."""
 
     _SERVICE: ClassVar[str] = SERVICES.CONTACT
-
