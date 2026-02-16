@@ -32,6 +32,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   module and shared by adapters.
 - **CLI entrypoint composition root**: CLI wiring now lives in
   `adapters/cli/main.py`.
+- **CLI architecture simplification**: Contact CLI states now call
+  `ContactService` directly through `AppContext.service` (no adapter
+  controller layer in the runtime flow).
+- **Integration testing path**: Contact integration tests now exercise a
+  service-backed adapter client (`Service -> Repository -> Database`) while
+  keeping DTO-level assertions.
+- **Documentation alignment**: `README.md`, `DEVELOPMENT.md`,
+  `ARCHITECTURE.md`, and `API_GUIDELINES.md` were updated to reflect the
+  service-driven CLI design.
+
+### Removed
+
+- **Obsolete CLI controller files**: Removed
+  `adapters/cli/base_controller.py` and `adapters/cli/contact_controller.py`.
+- **Obsolete controller protocol**: Removed
+  `core/interfaces/controller.py` and its export from
+  `core/interfaces/__init__.py`.
 
 ## [0.1.0] - 2026-02-08
 

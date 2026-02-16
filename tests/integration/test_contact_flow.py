@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Integration tests for the complete contact management flow.
 
-These tests verify the full stack from Controller -> Service -> Repository -> Database,
+These tests verify the full stack from Service -> Repository -> Database,
 ensuring all layers work together correctly.
 
 Note on logging language:
@@ -15,12 +15,62 @@ from contextlib import suppress
 
 import pytest
 
-from archive_manager.adapters.cli import ContactCslController
 from archive_manager.application.dto import ContactDTO
+from archive_manager.application.dto.contact_page_dto import ContactPageDTO
 from archive_manager.application.services import ContactService
 from archive_manager.core.errors import AppValidationErrors, AppWarning
 from archive_manager.infrastructure.persistence import SqliteContactRepository
 from archive_manager.infrastructure.persistence.db import SqliteConnection
+
+
+class _ServiceClient:
+    """Test adapter exposing DTO-oriented operations over ContactService."""
+
+    def __init__(self, service: ContactService) -> None:
+        self._service = service
+
+    def add_contact(self, contact_dto: ContactDTO) -> ContactDTO:
+        contact = self._service.create(
+            first_name=contact_dto.first_name,
+            last_name=contact_dto.last_name,
+            email=contact_dto.email,
+            phone=contact_dto.phone,
+        )
+        return ContactDTO.from_entity(contact)
+
+    def list_contacts(self, limit: int = 20, offset: int = 0) -> ContactPageDTO:
+        page = self._service.list_contacts(limit=limit, offset=offset)
+        contacts = [ContactDTO.from_entity(contact) for contact in page.contacts]
+        return ContactPageDTO(
+            contacts=contacts,
+            total=page.total,
+            limit=page.limit,
+            offset=page.offset,
+        )
+
+    def search_contact_by_name(self, full_name: str):
+        contacts = self._service.find_by_name(full_name)
+        return [ContactDTO.from_entity(contact) for contact in contacts]
+
+    def search_contact_by_email(self, email: str) -> ContactDTO:
+        return ContactDTO.from_entity(self._service.find_by_email(email))
+
+    def search_contact_by_phone(self, phone: str) -> ContactDTO:
+        return ContactDTO.from_entity(self._service.find_by_phone(phone))
+
+    def edit_contact(self, contact: ContactDTO) -> ContactDTO:
+        updated = self._service.update(
+            contact_id=contact.contact_id,
+            first_name=contact.first_name,
+            last_name=contact.last_name,
+            email=contact.email,
+            phone=contact.phone,
+        )
+        return ContactDTO.from_entity(updated)
+
+    def delete_contact(self, contact_id: int) -> bool:
+        return self._service.delete(contact_id)
+
 
 # ==============================================================================
 # Fixtures
@@ -31,14 +81,14 @@ from archive_manager.infrastructure.persistence.db import SqliteConnection
 def integration_stack():
     """Create a full integration stack with all layers connected.
 
-    Returns a tuple of (controller, service, repository, connection).
+    Returns a tuple of (client, service, repository, connection).
     """
     db = SqliteConnection("sqlite:///:memory:")
     repo = SqliteContactRepository(db)
     svc = ContactService(repository=repo)
-    ctrl = ContactCslController(service=svc)
+    client = _ServiceClient(service=svc)
 
-    yield ctrl, svc, repo, db
+    yield client, svc, repo, db
 
     db.close()
 
@@ -56,7 +106,7 @@ class TestContactCreationFlow:
         """Test creating a contact through all layers."""
         ctrl, _svc, repo, _ = integration_stack
 
-        # Create via controller (simulates UI action)
+        # Create via service-backed client (simulates adapter action)
         dto = ContactDTO(
             contact_id=0,
             first_name="John",
@@ -98,7 +148,7 @@ class TestContactCreationFlow:
         assert emails == {"ana@example.com", "bob@example.com", "carlos@example.com"}
 
     def test_list_contacts_uses_default_limit_and_offset(self, integration_stack):
-        """Test controller exposes page counters and item ranges."""
+        """Test service-backed client exposes page counters and item ranges."""
         ctrl, _, _, _ = integration_stack
 
         for i in range(52):

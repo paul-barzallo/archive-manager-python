@@ -11,13 +11,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from archive_manager.adapters.cli import ContactCslController, create_context, run
+from archive_manager.adapters.cli import create_context, run
 from archive_manager.adapters.cli.states import (
     AppContext,
     BaseState,
     MainContactMenuState,
 )
 from archive_manager.adapters.cli.ui import ContactCslUI
+from archive_manager.application.services import ContactService
 from archive_manager.infrastructure.config import (
     DEFAULT_LANGUAGE,
     Session,
@@ -53,11 +54,11 @@ class TestCreateContext:
 
         assert isinstance(ctx.ui, ContactCslUI)
 
-    def test_create_context_has_controller(self) -> None:
-        """Verify context has a ContactCslController instance."""
+    def test_create_context_has_service(self) -> None:
+        """Verify context has a ContactService instance."""
         ctx = create_context()
 
-        assert isinstance(ctx.controller, ContactCslController)
+        assert isinstance(ctx.service, ContactService)
 
 
 class TestRun:
@@ -137,13 +138,13 @@ class TestAppContext:
         """Verify AppContext can be instantiated with components."""
         session = Session()
         ui = MagicMock(spec=ContactCslUI)
-        controller = MagicMock(spec=ContactCslController)
+        service = MagicMock(spec=ContactService)
 
-        ctx = AppContext(session, ui, controller)
+        ctx = AppContext(session, ui, service)
 
         assert ctx.session is session
         assert ctx.ui is ui
-        assert ctx.controller is controller
+        assert ctx.service is service
 
 
 class TestCLIComponents:

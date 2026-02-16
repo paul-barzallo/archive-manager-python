@@ -6,7 +6,6 @@ from __future__ import annotations
 import logging
 import sys
 
-from archive_manager.adapters.cli.contact_controller import ContactCslController
 from archive_manager.adapters.cli.states.contact_states import (
     AppContext,
     BaseState,
@@ -30,7 +29,7 @@ from archive_manager.infrastructure.persistence.db import SqliteConnection
 logger = logging.getLogger(__name__)
 
 # Type alias for contact context
-ContactContext = AppContext[ContactCslUI, ContactCslController]
+ContactContext = AppContext[ContactCslUI, ContactService]
 
 
 def create_context() -> ContactContext:
@@ -39,7 +38,7 @@ def create_context() -> ContactContext:
     Wires all components via constructor injection. No global singletons.
 
     Returns:
-        Configured AppContext with session, UI, and controller.
+        Configured AppContext with session, UI, and service.
     """
     settings = Settings()
 
@@ -56,17 +55,16 @@ def create_context() -> ContactContext:
     connection = SqliteConnection(settings.database)
     repo = SqliteContactRepository(connection)
     service = ContactService(repo)
-    controller = ContactCslController(service)
     ui = ContactCslUI()
 
-    return AppContext(session, ui, controller)
+    return AppContext(session, ui, service)
 
 
 def run(ctx: ContactContext) -> None:
     """Run the state machine loop.
 
     Args:
-        ctx: Application context with session, UI, and controller.
+        ctx: Application context with session, UI, and service.
     """
     state: BaseState | None = MainContactMenuState()
 

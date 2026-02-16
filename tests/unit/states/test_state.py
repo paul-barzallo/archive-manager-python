@@ -48,15 +48,15 @@ def mock_session():
 
 
 @pytest.fixture
-def mock_controller():
-    """Create mock controller."""
+def mock_service():
+    """Create mock service."""
     return MagicMock()
 
 
 @pytest.fixture
-def mock_context(mock_session, mock_ui, mock_controller):
+def mock_context(mock_session, mock_ui, mock_service):
     """Create mock application context."""
-    return AppContext(session=mock_session, ui=mock_ui, controller=mock_controller)
+    return AppContext(session=mock_session, ui=mock_ui, service=mock_service)
 
 
 # ==============================================================================

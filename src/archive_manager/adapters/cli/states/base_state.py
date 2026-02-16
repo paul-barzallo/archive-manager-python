@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""State machine base and generic application context for console controllers.
+"""State machine base and generic application context for console adapters.
 
 Provides ``BaseState`` (abstract state), ``AppContext`` (generic context
 dataclass), and the ``handle_errors`` decorator for centralised domain
@@ -25,34 +25,34 @@ from archive_manager.core.errors import (
 )
 
 if TYPE_CHECKING:
-    from archive_manager.adapters.cli import BaseCslController
     from archive_manager.adapters.cli.ui import CslUI
+    from archive_manager.core.interfaces import Service
     from archive_manager.infrastructure.config import Session
 
 logger = logging.getLogger(__name__)
 
 # Type variables for generic context
 U = TypeVar("U", bound="CslUI")
-C = TypeVar("C", bound="BaseCslController")
+S = TypeVar("S", bound="Service")
 T = TypeVar("T")
 
 
 @dataclass
-class AppContext(Generic[U, C]):
-    """Generic application context holding session, UI and controller.
+class AppContext(Generic[U, S]):
+    """Generic application context holding session, UI and service.
 
-    Type parameters allow subclasses to specify concrete UI and Controller types
+    Type parameters allow subclasses to specify concrete UI and Service types
     for type-safe access without casts.
 
     Attributes:
         session: User session with language configuration.
         ui: Console UI instance for user interaction.
-        controller: Controller instance for business logic.
+        service: Service instance for business logic.
     """
 
     session: Session
     ui: U
-    controller: C
+    service: S
 
 
 # --- State machine base ---
@@ -82,7 +82,7 @@ class BaseState(ABC):
     def handle_errors(
         func: Callable[..., T], self: Any, ctx: Any, *args: Any, **kwargs: Any
     ) -> T | None:
-        """Decorator to centralize domain error handling for controller actions.
+        """Decorator to centralize domain error handling for service actions.
 
         Error handling hierarchy (least to most severe):
         1. AppValidationErrors: Show all errors, allow retry

@@ -40,7 +40,6 @@ The domain layer. It has no external dependencies.
   - `Repository`: Marker protocol for all repositories.
   - `ContactRepository`: Protocol defining CRUD and search operations.
   - `Service`: Protocol contract for application services.
-  - `Controller`: Protocol contract for controllers.
   - `DBConnection`: Protocol contract for database connections.
 
 ### 2. Application (`application/`)
@@ -54,7 +53,7 @@ Use-case and business-rule layer. Depends only on `core/`.
     and canonical phone search.
   - `policies/ContactPolicy`: Uniqueness rules evaluated before persistence.
 - **`dto/`**
-  - `ContactDTO`: Data-transfer object for the controller-service boundary.
+  - `ContactDTO`: Data-transfer object for adapter-service boundaries.
   - `ContactPageDTO`: Paginated list response DTO (`contacts`, `total`,
     `limit`, `offset`) with derived metadata for consumers.
 
@@ -86,13 +85,10 @@ Depends only on `core/`.
 Delivery mechanisms. Currently provides a CLI adapter.
 
 - **`cli/`**
-  - `BaseCslController(ABC, Controller, Generic[TService])`: Abstract
-    controller base satisfying the `Controller` protocol.
-  - `ContactCslController`: Controller for contact operations, including
-    bounded paginated listing.
+  - `main.py`: CLI composition root and dependency wiring.
   - `states/BaseState`: State-machine base with `@handle_errors` decorator.
-  - `states/contact_states.py`: Concrete states (menus, create, search,
-    edit, delete, list pagination).
+  - `states/contact_states.py`: Concrete states calling `ContactService`
+    directly (menus, create, search, edit, delete, list pagination).
   - `ui/CslUI`: Rich-based console UI (menus, tables, prompts).
   - `ui/ContactCslUI`: Contact-specific UI with paginated table footer and
     list navigation actions.
@@ -138,16 +134,15 @@ adapters/cli/main.py
 |-- SqliteConnection(settings.database)
 |   +-- SqliteContactRepository(connection)
 |       +-- ContactService(repository)
-|           +-- ContactCslController(service)
 +-- ContactCslUI()
-+-- AppContext(session, ui, controller)
++-- AppContext(session, ui, service)
 +-- run(context)
 ```
 
 ## Data Flow
 
 ```text
-State Machine --> Controller --> Service --> Repository --> ORM --> SQLite
+State Machine --> Service --> Repository --> ORM --> SQLite
       |                                                      ^
       +-- UI (Rich) --> i18n loaders --> JSON resources       |
                                                               |

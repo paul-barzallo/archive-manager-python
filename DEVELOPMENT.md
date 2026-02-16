@@ -147,12 +147,12 @@ belong in `infrastructure/`, not in `core/interfaces/`.
 
 ## Naming Conventions
 
-- **Protocols**: Named after the concept (`Service`, `Controller`,
-  `Repository`, `Entity`, `DBConnection`).
+- **Protocols**: Named after the concept (`Service`, `Repository`,
+  `Entity`, `DBConnection`).
 - **Abstract base classes**: Prefixed with `Base` (`BaseService`,
-  `BaseCslController`, `BaseEntity`, `BaseContactRepository`, `BaseState`).
+  `BaseEntity`, `BaseContactRepository`, `BaseState`).
 - **Concrete classes**: Named after the implementation
-  (`ContactService`, `ContactCslController`, `SqliteContactRepository`).
+  (`ContactService`, `SqliteContactRepository`).
 - **Filenames**: Follow the class name in snake_case (`base_service.py`,
   `contact_service.py`).
 - **Singular form**: All names use singular form (`Contact`, not `Contacts`).

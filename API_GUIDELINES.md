@@ -57,5 +57,4 @@ adapters/api/
 
 ## Context Links
 
-* [Controller Reference](../src/archive_manager/adapters/cli/contact_controller.py) - See how CLI calls the service.
 * [Service Reference](../src/archive_manager/application/services/contact_service.py) - The business logic we are wrapping.

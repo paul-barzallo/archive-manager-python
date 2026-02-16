@@ -144,19 +144,6 @@ def sample_contacts(sql_repository) -> Generator[list, None, None]:
 
 
 # ==============================================================================
-# Controller Fixtures
-# ==============================================================================
-
-
-@pytest.fixture
-def controller(service):
-    """Create a ContactCslController with injected service."""
-    from archive_manager.adapters.cli import ContactCslController
-
-    return ContactCslController(service=service)
-
-
-# ==============================================================================
 # Markers
 # ==============================================================================
 

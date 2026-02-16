@@ -13,7 +13,7 @@ from archive_manager.core.entities import Contact
 from archive_manager.core.entities.validators import ContactValidator
 from archive_manager.core.errors import AppValidationErrors, AppWarning
 from archive_manager.core.interfaces import ContactRepository
-from archive_manager.infrastructure.config import SERVICES
+from archive_manager.infrastructure.config import PAGINATION, SERVICES
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +37,8 @@ class ContactService(BaseService[ContactRepository]):
     """
 
     NAME = SERVICES.CONTACT
-    DEFAULT_LIST_LIMIT = 20
-    MAX_LIST_LIMIT = 20
+    DEFAULT_LIST_LIMIT = PAGINATION.CONTACTS_PAGE_SIZE
+    MAX_LIST_LIMIT = PAGINATION.CONTACTS_PAGE_SIZE
 
     def get(self, contact_id: int) -> Contact:
         """Get a contact by ID.
@@ -287,7 +287,7 @@ class ContactService(BaseService[ContactRepository]):
             )
 
         total = len(contacts)
-        page = contacts[offset : offset + limit]
+        page = contacts[offset : (offset + limit)]
         return ContactPage(contacts=page, total=total, limit=limit, offset=offset)
 
     def _normalize_limit(self, limit: int) -> int:

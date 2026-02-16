@@ -8,14 +8,12 @@ abstractions, never on concrete implementations.
 
 from .connection import DBConnection
 from .contact_repository import ContactRepository
-from .controller import Controller
 from .entity import Entity
 from .repository import Repository
 from .service import Service
 
 __all__ = [
     "ContactRepository",
-    "Controller",
     "DBConnection",
     "Entity",
     "Repository",

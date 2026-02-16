@@ -9,7 +9,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from archive_manager.adapters.cli.ui.csl_ui import CslUI
+from InquirerPy.prompts.list import ListPrompt
+from InquirerPy.separator import Separator
+
+from archive_manager.adapters.cli.ui.csl_ui import _INQUIRER_STYLE, CslUI
 from archive_manager.application.dto import ContactDTO
 from archive_manager.infrastructure.i18n import (
     ContactI18nMenus,
@@ -88,6 +91,102 @@ class ContactCslUI(CslUI):
         menu.add_option(option_return.id, option_return.text)
         return self._show_menu(menu)
 
+    def show_paginated_select_contact_menu(
+        self,
+        language: str,
+        contacts: Sequence[ContactDTO],
+        offset: int,
+        limit: int,
+    ) -> str:
+        """Display paginated select-contact menu with navigation actions.
+
+        Args:
+            language: Language code for i18n.
+            contacts: Sequence of contacts to paginate and display.
+            offset: Zero-based start index of the current page.
+            limit: Maximum number of contacts shown per page.
+
+        Returns:
+            Selected action: contact index (string), ``previous``, ``next`` or
+            ``return``.
+        """
+        menu = ContactI18nMenus.select_contact_menu(language)
+        pagination_menu = ContactI18nMenus.contact_pagination_menu(language)
+        pagination_labels = {opt.id: opt.text for opt in pagination_menu.options}
+
+        total = len(contacts)
+        page_contacts = contacts[offset : offset + limit]
+
+        choices: list[dict[str, str] | Separator] = [
+            Separator(menu.title),
+            Separator(""),
+        ]
+
+        for local_index, contact in enumerate(page_contacts, start=1):
+            absolute_index = offset + local_index - 1
+            detail = "< "
+            detail += " | ".join(
+                f"{item['text']}: {item['value']}"
+                for item in self._get_contact_fields(language, contact)
+            )
+            detail += " >"
+            choices.append(
+                {"name": f"{local_index}. {detail}", "value": str(absolute_index)}
+            )
+
+        page = (offset // max(1, limit)) + 1
+        pages = max(1, (total + max(1, limit) - 1) // max(1, limit))
+        start = offset + 1
+        end = offset + len(page_contacts)
+
+        choices.extend(
+            [
+                Separator(""),
+                Separator(
+                    self._build_select_footer(
+                        language=language,
+                        page=page,
+                        pages=pages,
+                        start=start,
+                        end=end,
+                        total=total,
+                    )
+                ),
+                Separator(""),
+            ]
+        )
+
+        has_previous = offset > 0
+        has_next = (offset + len(page_contacts)) < total
+
+        if has_previous and "previous" in pagination_labels:
+            choices.append({"name": pagination_labels["previous"], "value": "previous"})
+        if has_next and "next" in pagination_labels:
+            choices.append({"name": pagination_labels["next"], "value": "next"})
+
+        default_return = "Volver" if language.startswith("es") else "Return"
+        choices.append(
+            {
+                "name": pagination_labels.get("return", default_return),
+                "value": "return",
+            }
+        )
+
+        self.show_title()
+        result: str = ListPrompt(
+            message="",
+            choices=choices,
+            qmark="",
+            amark="",
+            pointer=">",
+            instruction="",
+            long_instruction="",
+            style=_INQUIRER_STYLE,
+            show_cursor=False,
+            cycle=True,
+        ).execute()
+        return result
+
     def show_contacts_table(
         self,
         language: str,
@@ -128,7 +227,7 @@ class ContactCslUI(CslUI):
 
         Supports both full-list rendering (when ``total`` is not provided)
         and true paginated rendering (when ``total``/``limit``/``offset`` are
-        provided by the controller).
+        provided by the service layer).
         """
         total_value = shown if total is None else max(0, total)
         safe_limit = max(1, shown if limit is None else limit)
@@ -198,6 +297,20 @@ class ContactCslUI(CslUI):
             title,
             self._get_contact_fields(language, contact),
         )
+
+    @staticmethod
+    def _build_select_footer(
+        language: str,
+        page: int,
+        pages: int,
+        start: int,
+        end: int,
+        total: int,
+    ) -> str:
+        """Build footer text for paginated search results."""
+        if language.startswith("es"):
+            return f"Página {page} de {pages} · desde {start} a {end} de {total}"
+        return f"Page {page} of {pages} · from {start} to {end} of {total}"
 
     def _get_contact_fields(
         self, language: str, contact: ContactDTO

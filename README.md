@@ -183,7 +183,7 @@ src/archive_manager/
 │   ├── i18n/               #   Message, menu, and table loaders
 │   └── persistence/        #   Repository, ORM, mappers, bootstrap
 ├── adapters/               # Delivery mechanisms (depends on all layers)
-│   ├── cli/                #   Controller, state machine, Rich UI
+│   ├── cli/                #   Service-driven state machine and Rich UI
 │   │   └── main.py         #   CLI composition root
 │   └── api/                #   FastAPI app, dependencies, routers, schemas
 └── resources/

@@ -364,6 +364,88 @@ class TestContactCslUISelectMenu:
         result = contacts_ui.show_select_contact_menu("en", sample_contacts)
         assert result == "return"
 
+    @patch("archive_manager.adapters.cli.ui.contact_csl_ui.ListPrompt")
+    def test_show_paginated_select_contact_menu_first_page(
+        self,
+        mock_list_prompt: MagicMock,
+        contacts_ui: ContactCslUI,
+    ) -> None:
+        """Test paginated select menu shows next and return on first page."""
+        contacts = [
+            ContactDTO(i, f"name{i}", "last", f"u{i}@e.com", f"+34111{i:06d}")
+            for i in range(1, 26)
+        ]
+
+        mock_instance = MagicMock()
+        mock_instance.execute.return_value = "next"
+        mock_list_prompt.return_value = mock_instance
+
+        result = contacts_ui.show_paginated_select_contact_menu(
+            language="en",
+            contacts=contacts,
+            offset=0,
+            limit=20,
+        )
+
+        assert result == "next"
+        choices = mock_list_prompt.call_args.kwargs["choices"]
+        option_values = {
+            choice["value"]
+            for choice in choices
+            if isinstance(choice, dict) and "value" in choice
+        }
+        separator_values = [
+            str(choice) for choice in choices if not isinstance(choice, dict)
+        ]
+
+        assert "next" in option_values
+        assert "previous" not in option_values
+        assert "return" in option_values
+        assert any(
+            "Page 1 of 2 · from 1 to 20 of 25" in value for value in separator_values
+        )
+
+    @patch("archive_manager.adapters.cli.ui.contact_csl_ui.ListPrompt")
+    def test_show_paginated_select_contact_menu_last_page(
+        self,
+        mock_list_prompt: MagicMock,
+        contacts_ui: ContactCslUI,
+    ) -> None:
+        """Test paginated select menu shows previous and return on last page."""
+        contacts = [
+            ContactDTO(i, f"name{i}", "last", f"u{i}@e.com", f"+34111{i:06d}")
+            for i in range(1, 26)
+        ]
+
+        mock_instance = MagicMock()
+        mock_instance.execute.return_value = "previous"
+        mock_list_prompt.return_value = mock_instance
+
+        result = contacts_ui.show_paginated_select_contact_menu(
+            language="en",
+            contacts=contacts,
+            offset=20,
+            limit=20,
+        )
+
+        assert result == "previous"
+        choices = mock_list_prompt.call_args.kwargs["choices"]
+        option_values = {
+            choice["value"]
+            for choice in choices
+            if isinstance(choice, dict) and "value" in choice
+        }
+        separator_values = [
+            str(choice) for choice in choices if not isinstance(choice, dict)
+        ]
+
+        assert "previous" in option_values
+        assert "next" not in option_values
+        assert "return" in option_values
+        assert any(
+            "Page 2 of 2 · from 21 to 25 of 25" in value for value in separator_values
+        )
+
 
 # ==============================================================================
 # Integration-like Tests (with real i18n)

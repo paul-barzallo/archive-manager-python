@@ -57,13 +57,11 @@ class TestDomainImports:
         """Test interface (protocol) exports."""
         from archive_manager.core.interfaces import (
             ContactRepository,
-            Controller,
             DBConnection,
             Repository,
             Service,
         )
 
-        assert Controller is not None
         assert ContactRepository is not None
         assert DBConnection is not None
         assert Repository is not None
@@ -175,11 +173,13 @@ class TestI18nImports:
 class TestAdapterImports:
     """Test adapter layer imports."""
 
-    def test_cli_controllers_import(self) -> None:
-        """Test CLI controller module exports."""
-        from archive_manager.adapters.cli import ContactCslController
+    def test_cli_adapter_import(self) -> None:
+        """Test CLI adapter exports."""
+        from archive_manager.adapters.cli import create_context, main, run
 
-        assert ContactCslController is not None
+        assert callable(main)
+        assert callable(create_context)
+        assert callable(run)
 
     def test_cli_ui_import(self) -> None:
         """Test CLI UI module exports."""

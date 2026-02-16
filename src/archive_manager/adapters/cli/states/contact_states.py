@@ -2,7 +2,7 @@
 """Console state machine for contact management application.
 
 Orchestrates user interaction via CslUI, menu navigation via Menus,
-and business logic via ContactCslController. Handles domain-specific errors
+and business logic via ContactService. Handles domain-specific errors
 and displays localized messages.
 """
 
@@ -15,15 +15,16 @@ from typing import TYPE_CHECKING, TypeAlias
 
 from archive_manager.adapters.cli.states.base_state import AppContext, BaseState
 from archive_manager.adapters.cli.ui.contact_csl_ui import ContactCslUI
-from archive_manager.application.dto import ContactDTO
+from archive_manager.application.dto import ContactDTO, ContactPageDTO
+from archive_manager.infrastructure.config import PAGINATION
 
 if TYPE_CHECKING:
-    from archive_manager.adapters.cli import ContactCslController
+    from archive_manager.application.services import ContactService
 
 logger = logging.getLogger(__name__)
 
 # Type alias for contact-specific context (string annotation for runtime)
-ContactContext: TypeAlias = AppContext[ContactCslUI, "ContactCslController"]
+ContactContext: TypeAlias = AppContext[ContactCslUI, "ContactService"]
 
 
 # --- State Machines ---
@@ -35,7 +36,7 @@ class MainContactMenuState(BaseState):
         """Execute main menu and handle user selection.
 
         Args:
-            ctx: Application context with UI and controller.
+            ctx: Application context with UI and service.
 
         Returns:
             Next state or `None` to exit.
@@ -67,11 +68,17 @@ class MainContactMenuState(BaseState):
     def _add_contact(self, ctx: ContactContext, contact: ContactDTO) -> None:
         """Prompt for contact data, persist it, and show confirmation."""
         ui = ctx.ui
-        controller = ctx.controller
+        service = ctx.service
         lang = ctx.session.language
 
         contact = self._contact_input(ctx, contact)
-        contact = controller.add_contact(contact)
+        created = service.create(
+            first_name=contact.first_name,
+            last_name=contact.last_name,
+            email=contact.email,
+            phone=contact.phone,
+        )
+        contact = ContactDTO.from_entity(created)
         ui.print_success(lang, "SUCCESS_CONTACT_CREATED")
         ui.show_contact_detail(lang, contact)
         ui.pause(lang)
@@ -113,30 +120,32 @@ class _FindMenuState(BaseState):
         """Execute find menu and search for contacts.
 
         Args:
-            ctx: Application context with UI and controller.
+            ctx: Application context with UI and service.
 
         Returns:
             Next state based on search results.
         """
         ui = ctx.ui
-        controller = ctx.controller
+        service = ctx.service
         lang = ctx.session.language
 
         option_id = ui.show_find_contact_menu(lang)
 
         if option_id == "full_name":
             full_name = ui.get_input(lang, "PROMPT_SEARCH_FULL_NAME")
-            contacts = controller.search_contact_by_name(full_name)
+            contacts = [
+                ContactDTO.from_entity(c) for c in service.find_by_name(full_name)
+            ]
             return _SelectContactState(contacts)
 
         if option_id == "email":
             email = ui.get_input(lang, "PROMPT_SEARCH_EMAIL")
-            contact = controller.search_contact_by_email(email)
+            contact = ContactDTO.from_entity(service.find_by_email(email))
             return _ContactMenuState(contact, back=MainContactMenuState())
 
         if option_id == "phone":
             phone = ui.get_input(lang, "PROMPT_SEARCH_PHONE")
-            contact = controller.search_contact_by_phone(phone)
+            contact = ContactDTO.from_entity(service.find_by_phone(phone))
             return _ContactMenuState(contact, back=MainContactMenuState())
 
         if option_id == "return":
@@ -154,8 +163,8 @@ class _ListContactsState(BaseState):
     """
 
     offset: int = 0
-    limit: int = 20
-    pagination_threshold: int = 10
+    limit: int = PAGINATION.CONTACTS_PAGE_SIZE
+    pagination_threshold: int = PAGINATION.CONTACTS_THRESHOLD
 
     @BaseState.handle_errors
     def run(self, ctx: ContactContext) -> BaseState | None:
@@ -164,10 +173,16 @@ class _ListContactsState(BaseState):
         The table footer shows current page, total pages, and item range.
         """
         ui = ctx.ui
-        controller = ctx.controller
+        service = ctx.service
         lang = ctx.session.language
 
-        page = controller.list_contacts(limit=self.limit, offset=self.offset)
+        result = service.list_contacts(limit=self.limit, offset=self.offset)
+        page = ContactPageDTO(
+            contacts=[ContactDTO.from_entity(c) for c in result.contacts],
+            total=result.total,
+            limit=result.limit,
+            offset=result.offset,
+        )
         ui.show_contacts_table(
             lang,
             page.contacts,
@@ -206,6 +221,8 @@ class _SelectContactState(BaseState):
     """
 
     contacts: Sequence[ContactDTO]
+    offset: int = 0
+    limit: int = PAGINATION.CONTACTS_PAGE_SIZE
 
     def run(self, ctx: ContactContext) -> BaseState | None:
         """Display contact selection menu.
@@ -219,10 +236,40 @@ class _SelectContactState(BaseState):
         ui = ctx.ui
         lang = ctx.session.language
 
-        option_id = ui.show_select_contact_menu(lang, self.contacts)
+        if len(self.contacts) <= self.limit:
+            option_id = ui.show_select_contact_menu(lang, self.contacts)
+
+            if option_id == "return":
+                return _FindMenuState()
+
+            try:
+                index = int(option_id)
+                contact = self.contacts[index]
+            except (ValueError, IndexError):
+                return self
+
+            return _ContactMenuState(contact, back=_FindMenuState())
+
+        option_id = ui.show_paginated_select_contact_menu(
+            language=lang,
+            contacts=self.contacts,
+            offset=self.offset,
+            limit=self.limit,
+        )
 
         if option_id == "return":
             return _FindMenuState()
+
+        has_previous = self.offset > 0
+        has_next = (self.offset + self.limit) < len(self.contacts)
+
+        if option_id == "previous" and has_previous:
+            self.offset = max(0, self.offset - self.limit)
+            return self
+
+        if option_id == "next" and has_next:
+            self.offset += self.limit
+            return self
 
         try:
             index = int(option_id)
@@ -250,7 +297,7 @@ class _ContactMenuState(MainContactMenuState):
         """Execute contact menu and handle view/edit/delete.
 
         Args:
-            ctx: Application context with UI and controller.
+            ctx: Application context with UI and service.
 
         Returns:
             Next state based on user action.
@@ -287,11 +334,18 @@ class _ContactMenuState(MainContactMenuState):
     ) -> ContactDTO | None:
         """Prompt for updated data, persist changes, and show confirmation."""
         ui = ctx.ui
-        controller = ctx.controller
+        service = ctx.service
         lang = ctx.session.language
 
         contact = self._contact_input(ctx, contact)
-        contact = controller.edit_contact(contact)
+        updated = service.update(
+            contact_id=contact.contact_id,
+            first_name=contact.first_name,
+            last_name=contact.last_name,
+            email=contact.email,
+            phone=contact.phone,
+        )
+        contact = ContactDTO.from_entity(updated)
         ui.print_success(lang, "SUCCESS_CONTACT_UPDATED")
         ui.show_contact_detail(lang, contact)
         ui.pause(lang)
@@ -300,11 +354,11 @@ class _ContactMenuState(MainContactMenuState):
     def _delete_contact(self, ctx: ContactContext, contact_id: int) -> bool:
         """Ask for confirmation and soft-delete the contact."""
         ui = ctx.ui
-        controller = ctx.controller
+        service = ctx.service
         lang = ctx.session.language
 
         if ui.confirm(lang, "CONFIRM_DELETE_CONTACT"):
-            if controller.delete_contact(contact_id):
+            if service.delete(contact_id):
                 ui.print_success(lang, "SUCCESS_CONTACT_DELETED")
             else:
                 ui.print_warning(lang, "DELETE_NOT_FOUND")
