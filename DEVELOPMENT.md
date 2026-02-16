@@ -33,7 +33,7 @@ archive-manager
 Or run the module directly:
 
 ```bash
-python -m archive_manager.cli
+archive-manager cli
 ```
 
 ## Testing
@@ -126,7 +126,7 @@ The project enforces strict dependency boundaries between layers:
 | `application/` | `core/` only |
 | `infrastructure/` | `core/` only |
 | `adapters/` | `core/`, `application/`, `infrastructure/` |
-| `cli.py` | All layers (wiring root) |
+| `adapters/cli/main.py` | All layers (CLI wiring root) |
 
 Within a package, two conventions apply:
 
@@ -140,7 +140,7 @@ Within a package, two conventions apply:
 
 1. Define the interface (protocol) in `core/interfaces/`.
 2. Implement it in `infrastructure/` or `adapters/`.
-3. Wire it in `cli.py`.
+3. Wire it in `adapters/cli/main.py`.
 
 Abstract base classes that depend on external libraries (e.g. SQLAlchemy)
 belong in `infrastructure/`, not in `core/interfaces/`.
@@ -159,7 +159,8 @@ belong in `infrastructure/`, not in `core/interfaces/`.
 
 ## Dependency Injection
 
-`Settings` is created once in `cli.py` and injected into every component.
+`Settings` is created once in `adapters/cli/main.py` and injected into every
+component.
 There is no global singleton. I18n classes are configured once at startup
 via class-level `configure(i18n_settings)` calls.
 

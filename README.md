@@ -50,14 +50,28 @@ python -m venv .venv
 source .venv/bin/activate
 
 pip install -e .
+archive-manager cli
+```
+
+Run API server:
+
+```bash
+archive-manager api
+```
+
+Show available commands:
+
+```bash
 archive-manager
 ```
 
-Alternative entry point:
+API options:
 
 ```bash
-python -m archive_manager.cli
+archive-manager api --host 0.0.0.0 --port 3000 --reload
 ```
+
+Open interactive API docs at `http://127.0.0.1:8000/docs`.
 
 ## Configuration
 
@@ -156,7 +170,7 @@ merge.
 
 ```text
 src/archive_manager/
-├── cli.py                  # Entry point and dependency wiring
+├── __init__.py             # Entry point dispatcher (cli/api)
 ├── core/                   # Domain layer (no external dependencies)
 │   ├── errors.py           #   Exception hierarchy
 │   ├── entities/           #   Domain models and validators
@@ -169,7 +183,9 @@ src/archive_manager/
 │   ├── i18n/               #   Message, menu, and table loaders
 │   └── persistence/        #   Repository, ORM, mappers, bootstrap
 ├── adapters/               # Delivery mechanisms (depends on all layers)
-│   └── cli/                #   Controller, state machine, Rich UI
+│   ├── cli/                #   Controller, state machine, Rich UI
+│   │   └── main.py         #   CLI composition root
+│   └── api/                #   FastAPI app, dependencies, routers, schemas
 └── resources/
     └── i18n/               #   JSON resource files (en/, es/)
 ```

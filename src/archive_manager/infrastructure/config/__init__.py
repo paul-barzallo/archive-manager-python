@@ -6,6 +6,7 @@ from archive_manager.infrastructure.config.logging import configure_logging, get
 from archive_manager.infrastructure.config.session import Session
 from archive_manager.infrastructure.config.settings import (
     DEFAULT_LANGUAGE,
+    ApiSettings,
     DatabaseSettings,
     I18nSettings,
     LoggingSettings,
@@ -15,6 +16,7 @@ from archive_manager.infrastructure.config.settings import (
 __all__ = [
     "DEFAULT_LANGUAGE",
     "SERVICES",
+    "ApiSettings",
     "DatabaseSettings",
     "I18nSettings",
     "LoggingSettings",

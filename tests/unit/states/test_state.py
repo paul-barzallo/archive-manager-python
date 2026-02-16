@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from archive_manager.adapters.cli.states.base_state import AppContext, BaseState
+from archive_manager.adapters.cli.states import AppContext, BaseState
 from archive_manager.core.errors import (
     AppError,
     AppException,

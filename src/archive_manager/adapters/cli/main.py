@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
-"""Application entry point for the contact manager.
+"""Application entry point for the CLI adapter."""
 
-Orchestrates the application: creates components via dependency injection,
-configures i18n, and runs the main state machine loop.
-
-All dependencies are wired here — no module uses ``get_settings()`` singletons.
-"""
+from __future__ import annotations
 
 import logging
 import sys
 
-from archive_manager.adapters.cli import ContactCslController
-from archive_manager.adapters.cli.states import (
+from archive_manager.adapters.cli.contact_controller import ContactCslController
+from archive_manager.adapters.cli.states.contact_states import (
     AppContext,
     BaseState,
     MainContactMenuState,
 )
-from archive_manager.adapters.cli.ui import ContactCslUI
-from archive_manager.application.services import ContactService
+from archive_manager.adapters.cli.ui.contact_csl_ui import ContactCslUI
+from archive_manager.application.services.contact_service import ContactService
 from archive_manager.infrastructure.config import (
     DEFAULT_LANGUAGE,
     Session,
@@ -40,7 +36,7 @@ ContactContext = AppContext[ContactCslUI, ContactCslController]
 def create_context() -> ContactContext:
     """Create the application context with all dependencies.
 
-    Wires all components via constructor injection.  No global singletons.
+    Wires all components via constructor injection. No global singletons.
 
     Returns:
         Configured AppContext with session, UI, and controller.

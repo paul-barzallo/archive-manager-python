@@ -126,11 +126,11 @@ Validation is enforced at three levels:
 
 ## Dependency Injection
 
-`Settings` is created once in `cli.py` and passed to every component that
-requires configuration. There is no global singleton.
+`Settings` is created once in `adapters/cli/main.py` and passed to every
+component that requires configuration. There is no global singleton.
 
 ```text
-cli.py
+adapters/cli/main.py
 |-- Settings()
 |-- I18nMessages.configure(settings.i18n)
 |-- I18nMenus.configure(settings.i18n)

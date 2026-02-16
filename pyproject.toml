@@ -14,6 +14,9 @@ dependencies = [
     "rich>=13.7.0",
     "InquirerPy>=0.3.4",
     "decorator>=5.1.1",
+    # API
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
     # Database
     "SQLAlchemy>=2.0.0",
     # Configuration
@@ -27,6 +30,7 @@ dev = [
     # Testing
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
+    "httpx>=0.27.0",
     # Linting and formatting
     "ruff>=0.6.0",
     "mypy>=1.10.0",
@@ -37,7 +41,7 @@ dev = [
 ]
 
 [project.scripts]
-archive-manager = "archive_manager.cli:main"
+archive-manager = "archive_manager:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -104,13 +108,15 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 # S101: assert is used intentionally in tests
-"tests/**/*.py" = ["S101"]
+"tests/**/*.py" = ["S101", "S104"]
 # N818: Exception names are intentionally named for semantics
 "src/archive_manager/core/errors.py" = ["N818"]
 # S605: Shell command is safe (only cls/clear)
 "src/archive_manager/adapters/cli/ui/csl_ui.py" = ["S605"]
 # TRY301: Abstract raise is common pattern in repository layer
 "src/archive_manager/infrastructure/persistence/sqlite_contact_repository.py" = ["TRY301"]
+# B008: FastAPI Depends in default args is expected
+"src/archive_manager/adapters/api/**/*.py" = ["B008"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

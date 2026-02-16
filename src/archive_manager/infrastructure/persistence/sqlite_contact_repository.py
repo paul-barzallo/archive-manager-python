@@ -60,6 +60,29 @@ class SqliteContactRepository(BaseContactRepository[SqliteConnection]):
 
         return contact
 
+    def get(self, contact_id: int) -> Contact | None:
+        """Find a contact by ID.
+
+        Args:
+            contact_id: Contact identifier.
+
+        Returns:
+            Matching contact or ``None``.
+        """
+        try:
+            with self._db.get_session() as session:
+                orm = session.get(ContactORM, contact_id)
+                if not orm or orm.deleted_at:
+                    return None
+                return ContactMapper.from_orm(orm)
+
+        except Exception as exc:
+            raise AppInfrastructureError(
+                "PERSISTENCE_ERROR",
+                "SqliteContactRepository.get",
+                message=str(exc),
+            ) from exc
+
     def find_by_name(self, full_name: str) -> Sequence[Contact]:
         """Find contacts by partial name match.
 

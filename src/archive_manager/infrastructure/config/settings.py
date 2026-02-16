@@ -82,6 +82,16 @@ class LoggingSettings(BaseSettings):
         return Path(v) if isinstance(v, str) else v
 
 
+class ApiSettings(BaseSettings):
+    """API server settings."""
+
+    model_config = SettingsConfigDict(extra="ignore")
+
+    host: str = Field(default="127.0.0.1")
+    port: int = Field(default=8000, ge=1, le=65535)
+    reload: bool = Field(default=False)
+
+
 class I18nSettings(BaseSettings):
     """Internationalization settings."""
 
@@ -248,6 +258,7 @@ class Settings(BaseSettings):
     )
 
     database: DatabaseSettings = Field(default_factory=DatabaseSettings)
+    api: ApiSettings = Field(default_factory=ApiSettings)
     logging: LoggingSettings = Field(default_factory=LoggingSettings)
     i18n: I18nSettings = Field(default_factory=I18nSettings)
 

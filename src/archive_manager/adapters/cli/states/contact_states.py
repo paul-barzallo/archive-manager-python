@@ -13,8 +13,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, TypeAlias
 
-from archive_manager.adapters.cli.states import AppContext, BaseState
-from archive_manager.adapters.cli.ui import ContactCslUI
+from archive_manager.adapters.cli.states.base_state import AppContext, BaseState
+from archive_manager.adapters.cli.ui.contact_csl_ui import ContactCslUI
 from archive_manager.application.dto import ContactDTO
 
 if TYPE_CHECKING:

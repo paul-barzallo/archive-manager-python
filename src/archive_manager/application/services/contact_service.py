@@ -40,6 +40,26 @@ class ContactService(BaseService[ContactRepository]):
     DEFAULT_LIST_LIMIT = 20
     MAX_LIST_LIMIT = 20
 
+    def get(self, contact_id: int) -> Contact:
+        """Get a contact by ID.
+
+        Args:
+            contact_id: Contact identifier.
+
+        Returns:
+            The contact entity.
+
+        Raises:
+            AppWarning: If contact is not found.
+        """
+        contact = self._repo.get(contact_id)
+        if not contact:
+            raise AppWarning(
+                code="CONTACT_NOT_FOUND",
+                origin="ContactService.get",
+            )
+        return contact
+
     def create(
         self, first_name: str, last_name: str, email: str, phone: str
     ) -> Contact:
