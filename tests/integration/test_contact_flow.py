@@ -11,7 +11,9 @@ Note on logging language:
 
 from __future__ import annotations
 
+from collections.abc import Generator, Sequence
 from contextlib import suppress
+from typing import TypeAlias
 
 import pytest
 
@@ -48,7 +50,7 @@ class _ServiceClient:
             offset=page.offset,
         )
 
-    def search_contact_by_name(self, full_name: str):
+    def search_contact_by_name(self, full_name: str) -> Sequence[ContactDTO]:
         contacts = self._service.find_by_name(full_name)
         return [ContactDTO.from_entity(contact) for contact in contacts]
 
@@ -69,7 +71,15 @@ class _ServiceClient:
         return ContactDTO.from_entity(updated)
 
     def delete_contact(self, contact_id: int) -> bool:
-        return self._service.delete(contact_id)
+        return bool(self._service.delete(contact_id))
+
+
+IntegrationStack: TypeAlias = tuple[
+    _ServiceClient,
+    ContactService,
+    SqliteContactRepository,
+    SqliteConnection,
+]
 
 
 # ==============================================================================
@@ -78,7 +88,7 @@ class _ServiceClient:
 
 
 @pytest.fixture
-def integration_stack():
+def integration_stack() -> Generator[IntegrationStack, None, None]:
     """Create a full integration stack with all layers connected.
 
     Returns a tuple of (client, service, repository, connection).
@@ -102,7 +112,9 @@ def integration_stack():
 class TestContactCreationFlow:
     """Integration tests for contact creation end-to-end."""
 
-    def test_create_contact_full_stack(self, integration_stack):
+    def test_create_contact_full_stack(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating a contact through all layers."""
         ctrl, _svc, repo, _ = integration_stack
 
@@ -126,7 +138,9 @@ class TestContactCreationFlow:
         assert persisted is not None
         assert persisted.contact_id == result.contact_id
 
-    def test_create_and_list_multiple_contacts(self, integration_stack):
+    def test_create_and_list_multiple_contacts(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating multiple contacts and listing them."""
         ctrl, _, _, _ = integration_stack
 
@@ -147,7 +161,9 @@ class TestContactCreationFlow:
         emails = {c.email for c in page.contacts}
         assert emails == {"ana@example.com", "bob@example.com", "carlos@example.com"}
 
-    def test_list_contacts_uses_default_limit_and_offset(self, integration_stack):
+    def test_list_contacts_uses_default_limit_and_offset(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test service-backed client exposes page counters and item ranges."""
         ctrl, _, _, _ = integration_stack
 
@@ -204,7 +220,9 @@ class TestContactCreationFlow:
 class TestContactSearchFlow:
     """Integration tests for contact search functionality."""
 
-    def test_search_by_name_partial_match(self, integration_stack):
+    def test_search_by_name_partial_match(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test searching contacts by partial name match."""
         ctrl, _, _, _ = integration_stack
 
@@ -220,7 +238,9 @@ class TestContactSearchFlow:
         first_names = {c.first_name for c in results}
         assert first_names == {"John", "Jane"}
 
-    def test_search_by_email_exact_match(self, integration_stack):
+    def test_search_by_email_exact_match(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test searching contact by exact email."""
         ctrl, _, _, _ = integration_stack
 
@@ -231,7 +251,9 @@ class TestContactSearchFlow:
         assert result is not None
         assert result.first_name == "John"
 
-    def test_search_by_phone_exact_match(self, integration_stack):
+    def test_search_by_phone_exact_match(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test searching contact by exact phone number."""
         ctrl, _, _, _ = integration_stack
 
@@ -247,7 +269,9 @@ class TestContactSearchFlow:
 class TestContactUpdateFlow:
     """Integration tests for contact update functionality."""
 
-    def test_update_contact_full_stack(self, integration_stack):
+    def test_update_contact_full_stack(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test updating a contact through all layers."""
         ctrl, _, repo, _ = integration_stack
 
@@ -284,7 +308,7 @@ class TestContactUpdateFlow:
 class TestContactDeleteFlow:
     """Integration tests for contact deletion (soft delete) functionality."""
 
-    def test_soft_delete_contact(self, integration_stack):
+    def test_soft_delete_contact(self, integration_stack: IntegrationStack) -> None:
         """Test soft deleting a contact."""
         ctrl, _, _repo, _ = integration_stack
 
@@ -301,7 +325,9 @@ class TestContactDeleteFlow:
             ctrl.list_contacts()
         assert wi.value.code == "EMPTY_CONTACT_LIST"
 
-    def test_email_can_be_reused_after_soft_delete(self, integration_stack):
+    def test_email_can_be_reused_after_soft_delete(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test that email can be reused after contact is soft deleted."""
         ctrl, _svc, _repo, _ = integration_stack
 
@@ -319,7 +345,9 @@ class TestContactDeleteFlow:
         assert new_contact.contact_id != created.contact_id
         assert new_contact.email == "john@example.com"
 
-    def test_restore_soft_deleted_contact(self, integration_stack):
+    def test_restore_soft_deleted_contact(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test restoring a soft deleted contact."""
         ctrl, _, repo, _ = integration_stack
 
@@ -348,7 +376,9 @@ class TestContactDeleteFlow:
 class TestErrorPropagation:
     """Integration tests for error handling across layers."""
 
-    def test_validation_error_propagates_from_entity(self, integration_stack):
+    def test_validation_error_propagates_from_entity(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test that validation errors from entity layer propagate correctly."""
         ctrl, _, _, _ = integration_stack
 
@@ -362,7 +392,7 @@ class TestErrorPropagation:
         error_codes = [e.code for e in exc_info.value.errors]
         assert "FIRST_NAME_REQUIRED" in error_codes or "INVALID_EMAIL" in error_codes
 
-    def test_duplicate_email_error(self, integration_stack):
+    def test_duplicate_email_error(self, integration_stack: IntegrationStack) -> None:
         """Test duplicate email error propagates correctly."""
         ctrl, _, _, _ = integration_stack
 
@@ -378,7 +408,7 @@ class TestErrorPropagation:
         error_codes = [e.code for e in exc_info.value.errors]
         assert "DUPLICATE_EMAIL" in error_codes
 
-    def test_not_found_warning(self, integration_stack):
+    def test_not_found_warning(self, integration_stack: IntegrationStack) -> None:
         """Test not found warning for non-existent contact."""
         ctrl, _, _, _ = integration_stack
 
@@ -397,7 +427,9 @@ class TestErrorPropagation:
 class TestSpecialCharacters:
     """Integration tests for contacts with special characters."""
 
-    def test_contact_with_accented_characters(self, integration_stack):
+    def test_contact_with_accented_characters(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating contact with accented characters (Spanish, French, German)."""
         ctrl, _, _, _ = integration_stack
 
@@ -413,7 +445,9 @@ class TestSpecialCharacters:
         )
         assert result2.first_name == "Müller"
 
-    def test_contact_with_hyphen_and_apostrophe(self, integration_stack):
+    def test_contact_with_hyphen_and_apostrophe(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating contact with hyphenated names and apostrophes."""
         ctrl, _, _, _ = integration_stack
 
@@ -424,7 +458,9 @@ class TestSpecialCharacters:
         assert result.first_name == "Marie-Claire"
         assert result.last_name == "O'Brien"
 
-    def test_search_with_special_characters(self, integration_stack):
+    def test_search_with_special_characters(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test searching with special characters."""
         ctrl, _, _, _ = integration_stack
 
@@ -445,7 +481,9 @@ class TestSpecialCharacters:
 class TestEdgeCases:
     """Integration tests for edge cases and boundary conditions."""
 
-    def test_contact_with_max_length_fields(self, integration_stack):
+    def test_contact_with_max_length_fields(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating contact with maximum length field values."""
         ctrl, _, _, _ = integration_stack
 
@@ -459,7 +497,9 @@ class TestEdgeCases:
         assert len(result.first_name) == 100
         assert result.email == long_email
 
-    def test_contact_with_minimum_valid_phone(self, integration_stack):
+    def test_contact_with_minimum_valid_phone(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating contact with minimum valid phone (7 digits)."""
         ctrl, _, _, _ = integration_stack
 
@@ -469,7 +509,9 @@ class TestEdgeCases:
 
         assert result.phone == "1234567"
 
-    def test_contact_with_international_phone_format(self, integration_stack):
+    def test_contact_with_international_phone_format(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test creating contact with various international phone formats."""
         ctrl, _, _, _ = integration_stack
 
@@ -479,7 +521,7 @@ class TestEdgeCases:
         )
         assert result.phone == "+34600000000"
 
-    def test_empty_list_warning(self, integration_stack):
+    def test_empty_list_warning(self, integration_stack: IntegrationStack) -> None:
         """Test that empty contact list raises appropriate warning."""
         _ctrl, svc, _, _ = integration_stack
 
@@ -498,7 +540,9 @@ class TestEdgeCases:
 class TestTransactions:
     """Integration tests for transaction handling."""
 
-    def test_failed_create_does_not_persist(self, integration_stack):
+    def test_failed_create_does_not_persist(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test that failed creation doesn't leave partial data."""
         ctrl, _, repo, _ = integration_stack
 
@@ -515,7 +559,9 @@ class TestTransactions:
         all_contacts = repo.list_all()
         assert len(all_contacts) == 1
 
-    def test_update_rollback_on_error(self, integration_stack):
+    def test_update_rollback_on_error(
+        self, integration_stack: IntegrationStack
+    ) -> None:
         """Test that failed update doesn't corrupt data."""
         ctrl, _, repo, _ = integration_stack
 

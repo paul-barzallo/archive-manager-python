@@ -84,7 +84,7 @@ class _SqliteBootstrap:
 
         Handles multi-line ``BEGIN...END`` blocks (triggers) correctly.
         """
-        statements = []
+        statements: list[str] = []
         current: list[str] = []
         in_block = False
 

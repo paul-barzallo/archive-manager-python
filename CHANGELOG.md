@@ -5,10 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2026-02-16
+## [Unreleased] - 2026-02-17
 
 ### Added
 
+- **Strict typing enforcement**: Configured `pyrightconfig.json` and workspace
+  settings to enable Pylance "strict" mode for all source files in `src/`.
+- **Search pagination in CLI**: The name-based search result list now supports
+  the same pagination logic and navigation as the full contact list.
 - **API modularization**: FastAPI adapter was split into focused modules
   (`deps`, `handlers`, `routers`, and `schemas`) to reduce coupling and
   improve maintainability.
@@ -20,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Typing hardening**: Refactored the entire `src/` directory and `tests/`
+  to satisfy strict type checking, eliminating over 700 diagnostics across
+  the project.
+- **Test utility patterns**: Introduced type-safe "probe" classes and
+  explicit type aliases in tests to maintain high-quality DX under strict
+  analysis.
+- **Ruff configuration**: Updated linter settings to ignore E203 for
+  better compatibility with code formatters.
 - **Paginated contact list**: `list_contacts` now applies a bounded limit
   (default and maximum: 20) with offset-based paging metadata.
 - **List navigation**: Contact listing supports page navigation when

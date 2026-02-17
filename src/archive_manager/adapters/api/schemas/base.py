@@ -6,6 +6,11 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+def _empty_error_details() -> list[ErrorDetail]:
+    """Return an empty typed list of error details."""
+    return []
+
+
 class ErrorDetail(BaseModel):
     """Structured error detail payload."""
 
@@ -20,7 +25,7 @@ class ErrorResponse(BaseModel):
 
     detail: str
     status: int = 400
-    errors: list[ErrorDetail] = Field(default_factory=list)
+    errors: list[ErrorDetail] = Field(default_factory=_empty_error_details)
 
 
 class HealthResponse(BaseModel):

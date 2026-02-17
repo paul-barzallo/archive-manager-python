@@ -63,7 +63,7 @@ class BaseState(ABC):
     """
 
     @abstractmethod
-    def run(self, ctx: AppContext) -> BaseState | None:
+    def run(self, ctx: AppContext[Any, Any]) -> BaseState | None:
         """Execute a UI step and return the next state."""
         ...
 

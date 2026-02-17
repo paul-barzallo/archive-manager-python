@@ -118,7 +118,7 @@ class I18nMenus:
     @classmethod
     def names(cls) -> list[str]:
         """Return sorted list of cached menu names."""
-        names = set()
+        names: set[str] = set()
         with cls.__lock:
             for key in cls.__cache:
                 names.add(key[1])

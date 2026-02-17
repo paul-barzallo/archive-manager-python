@@ -1,0 +1,11 @@
+{
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "tests",
+        "**/__pycache__"
+    ],
+    "typeCheckingMode": "strict",
+    "reportUnusedFunction": "none"
+}

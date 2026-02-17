@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -28,7 +29,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or Settings()
 
     @asynccontextmanager
-    async def lifespan(app_instance: FastAPI):
+    async def lifespan(app_instance: FastAPI) -> AsyncIterator[None]:
         # Configure i18n subsystem
         I18nMessages.configure(app_settings.i18n)
         I18nMenus.configure(app_settings.i18n)

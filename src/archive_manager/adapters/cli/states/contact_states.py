@@ -313,9 +313,10 @@ class _ContactMenuState(MainContactMenuState):
             return self
 
         if option_id == "edit":
-            self.contact = self._edit_contact(ctx, self.contact)
-            if self.contact is None:
+            edited_contact = self._edit_contact(ctx, self.contact)
+            if edited_contact is None:
                 return self.back
+            self.contact = edited_contact
             return self
 
         if option_id == "del":

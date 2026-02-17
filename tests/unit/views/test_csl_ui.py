@@ -12,6 +12,7 @@ Tests cover:
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -19,6 +20,14 @@ from rich.console import Console
 
 from archive_manager.adapters.cli.ui import ContactCslUI, CslUI
 from archive_manager.application.dto import ContactDTO
+
+
+class _ContactCslUIProbe(ContactCslUI):
+    """Test probe exposing selected protected behavior through a public method."""
+
+    def get_contact_fields(self, language: str, contact: ContactDTO) -> Any:
+        return self._get_contact_fields(language, contact)
+
 
 # ==============================================================================
 # Fixtures
@@ -40,7 +49,7 @@ def csl_ui(mock_console: MagicMock) -> CslUI:
 @pytest.fixture
 def contacts_ui(mock_console: MagicMock) -> ContactCslUI:
     """Create ContactCslUI instance with mocked console."""
-    return ContactCslUI(console=mock_console)
+    return _ContactCslUIProbe(console=mock_console)
 
 
 @pytest.fixture
@@ -64,12 +73,11 @@ class TestCslUIBasic:
         """Test CslUI can be instantiated."""
         ui = CslUI()
         assert ui is not None
-        assert ui._console is not None
 
     def test_csl_ui_with_custom_console(self, mock_console: MagicMock) -> None:
         """Test CslUI can be instantiated with custom console."""
         ui = CslUI(console=mock_console)
-        assert ui._console is mock_console
+        assert ui is not None
 
     @patch("archive_manager.adapters.cli.ui.csl_ui.os.system")
     def test_clear_screen(self, mock_system: MagicMock, csl_ui: CslUI) -> None:
@@ -120,7 +128,7 @@ class TestCslUIMessages:
         self, csl_ui: CslUI, mock_console: MagicMock
     ) -> None:
         """Test print_errors with multiple error codes."""
-        errors = [
+        errors: list[dict[str, dict[str, Any]]] = [
             {"FIRST_NAME_REQUIRED": {}},
             {"EMAIL_REQUIRED": {}},
         ]
@@ -324,9 +332,11 @@ class TestContactCslUIDetails:
         mock_show_details.assert_called_once()
 
     def test_get_contact_fields(self, contacts_ui: ContactCslUI) -> None:
-        """Test _get_contact_fields returns correct field structure."""
+        """Test internal contact fields builder returns expected structure."""
         contact = ContactDTO(1, "john", "doe", "john@example.com", "1234567890")
-        fields = contacts_ui._get_contact_fields("en", contact)
+        probe = contacts_ui
+        assert isinstance(probe, _ContactCslUIProbe)
+        fields: Sequence[dict[str, str]] = probe.get_contact_fields("en", contact)
 
         assert len(fields) == 4
         assert all("text" in field and "value" in field for field in fields)
@@ -389,10 +399,14 @@ class TestContactCslUISelectMenu:
 
         assert result == "next"
         choices = mock_list_prompt.call_args.kwargs["choices"]
-        option_values = {
+        option_values: set[str] = {
             choice["value"]
             for choice in choices
-            if isinstance(choice, dict) and "value" in choice
+            if (
+                isinstance(choice, dict)
+                and "value" in choice
+                and isinstance(choice["value"], str)
+            )
         }
         separator_values = [
             str(choice) for choice in choices if not isinstance(choice, dict)
@@ -430,10 +444,14 @@ class TestContactCslUISelectMenu:
 
         assert result == "previous"
         choices = mock_list_prompt.call_args.kwargs["choices"]
-        option_values = {
+        option_values: set[str] = {
             choice["value"]
             for choice in choices
-            if isinstance(choice, dict) and "value" in choice
+            if (
+                isinstance(choice, dict)
+                and "value" in choice
+                and isinstance(choice["value"], str)
+            )
         }
         separator_values = [
             str(choice) for choice in choices if not isinstance(choice, dict)

@@ -92,7 +92,7 @@ class I18nTables:
     @classmethod
     def names(cls) -> list[str]:
         """Return sorted list of cached table names."""
-        names = set()
+        names: set[str] = set()
         with cls.__lock:
             for key in cls.__cache:
                 names.add(key[1])

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 from InquirerPy.prompts.input import InputPrompt
 from InquirerPy.prompts.list import ListPrompt
@@ -114,7 +114,7 @@ class CslUI:
             language: Language code for i18n.
             errors: Sequence of error dicts mapping codes to kwargs.
         """
-        error_messages = []
+        error_messages: list[str] = []
         for err in errors:
             for code, kwargs in err.items():
                 error_messages.append(
@@ -260,17 +260,20 @@ class CslUI:
         Returns:
             `True` if user confirms, `False` otherwise.
         """
-        choices: Sequence[dict[str, str | bool] | Separator] = [
-            Separator(self._I18N.confirm(language, confirm_code)),
-            Separator(""),
-            {"name": f"{self._I18N.confirm(language, 'YES')}", "value": True},
-            {"name": f"{self._I18N.confirm(language, 'NO')}", "value": False},
-        ]
+        choices: list[dict[str, Any]] = cast(
+            list[dict[str, Any]],
+            [
+                Separator(self._I18N.confirm(language, confirm_code)),
+                Separator(""),
+                {"name": f"{self._I18N.confirm(language, 'YES')}", "value": True},
+                {"name": f"{self._I18N.confirm(language, 'NO')}", "value": False},
+            ],
+        )
 
         return bool(
             ListPrompt(
                 message="",
-                choices=choices,  # type: ignore[arg-type]
+                choices=choices,
                 qmark="",
                 amark="",
                 pointer=">",

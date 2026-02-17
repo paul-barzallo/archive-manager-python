@@ -67,7 +67,7 @@ def register_handlers(app: FastAPI) -> None:
         exc: AppValidationErrors,
     ) -> JSONResponse:
         lang = get_language(request)
-        details = []
+        details: list[ErrorDetail] = []
         for err in exc.errors:
             # For validation errors, we usually have many small errors
             # We look them up as warnings or errors based on code

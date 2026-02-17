@@ -12,7 +12,7 @@ import logging
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import yaml
 from pydantic import Field, field_validator
@@ -332,7 +332,10 @@ class Settings(BaseSettings):
                 and isinstance(result[key], dict)
                 and isinstance(value, dict)
             ):
-                result[key] = Settings._deep_merge(result[key], value)
+                result[key] = Settings._deep_merge(
+                    cast(dict[str, Any], result[key]),
+                    cast(dict[str, Any], value),
+                )
             else:
                 result[key] = value
         return result

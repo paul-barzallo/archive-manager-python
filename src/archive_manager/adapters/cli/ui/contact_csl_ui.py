@@ -11,13 +11,26 @@ from collections.abc import Sequence
 
 from InquirerPy.prompts.list import ListPrompt
 from InquirerPy.separator import Separator
+from InquirerPy.utils import get_style
 
-from archive_manager.adapters.cli.ui.csl_ui import _INQUIRER_STYLE, CslUI
+from archive_manager.adapters.cli.ui.csl_ui import CslUI
 from archive_manager.application.dto import ContactDTO
 from archive_manager.infrastructure.i18n import (
     ContactI18nMenus,
     ContactI18nMessages,
     ContactI18nTables,
+)
+
+_CONTACT_INQUIRER_STYLE = get_style(
+    {
+        "question": "bold cyan",
+        "answer": "cyan",
+        "pointer": "cyan",
+        "marker": "bold green",
+        "separator": "bold cyan",
+        "instruction": "dim",
+    },
+    style_override=False,
 )
 
 
@@ -181,7 +194,7 @@ class ContactCslUI(CslUI):
             pointer=">",
             instruction="",
             long_instruction="",
-            style=_INQUIRER_STYLE,
+            style=_CONTACT_INQUIRER_STYLE,
             show_cursor=False,
             cycle=True,
         ).execute()

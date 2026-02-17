@@ -12,7 +12,7 @@ import json
 import logging
 from pathlib import Path
 from threading import Lock
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class I18nMessageLoader(_I18nBaseLoader):
                 message_data,
             )
             return None
-        return message_data
+        return cast(dict[str, str], message_data)
 
 
 class I18nMenusLoader(_I18nBaseLoader):
@@ -119,7 +119,7 @@ class I18nMenusLoader(_I18nBaseLoader):
                 menu_data,
             )
             return None
-        return menu_data
+        return cast(dict[str, Any], menu_data)
 
 
 class I18nTablesLoader(_I18nBaseLoader):
@@ -147,4 +147,4 @@ class I18nTablesLoader(_I18nBaseLoader):
                 table_data,
             )
             return None
-        return table_data
+        return cast(dict[str, Any], table_data)

@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import logging.config
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
@@ -53,7 +53,7 @@ def configure_logging(
 
     effective_level = "DEBUG" if debug else level
 
-    handlers: dict = {}
+    handlers: dict[str, dict[str, str | int]] = {}
     root_handlers: list[str] = []
 
     if log_dir:
@@ -88,7 +88,7 @@ def configure_logging(
         }
         root_handlers = ["debug_file", "info_file", "error_file"]
 
-    config = {
+    config: dict[str, Any] = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
