@@ -2,7 +2,7 @@
 """Base service class for the application layer.
 
 Provides a generic abstract base that concrete services (e.g.
-``ContactService``) inherit from. Controllers depend on the
+``ContactService``) inherit from. Adapters depend on the
 ``Service`` protocol defined in ``core.interfaces``; this base
 class satisfies that protocol.
 """

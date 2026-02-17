@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Service protocol for the application layer.
 
-Defines the contract that all services must satisfy. Controllers depend
+Defines the contract that all services must satisfy. Adapters depend
 on this protocol; concrete services implement it in the application layer.
 """
 
@@ -14,7 +14,7 @@ from typing import Protocol, runtime_checkable
 class Service(Protocol):
     """Contract for application services.
 
-    Defines the public interface that controllers depend on.
+    Defines the public interface that adapter layers depend on.
     Internal details such as repository injection and
     initialisation are handled by the ABC base class.
 

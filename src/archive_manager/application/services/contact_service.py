@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 from archive_manager.application.services.base_service import BaseService
 from archive_manager.application.services.policies import ContactPolicy
@@ -12,9 +13,19 @@ from archive_manager.core.entities import Contact
 from archive_manager.core.entities.validators import ContactValidator
 from archive_manager.core.errors import AppValidationErrors, AppWarning
 from archive_manager.core.interfaces import ContactRepository
-from archive_manager.infrastructure.config import SERVICES
+from archive_manager.infrastructure.config import PAGINATION, SERVICES
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class ContactPage:
+    """Paginated contacts result returned by the service layer."""
+
+    contacts: Sequence[Contact]
+    total: int
+    limit: int
+    offset: int
 
 
 class ContactService(BaseService[ContactRepository]):
@@ -26,6 +37,28 @@ class ContactService(BaseService[ContactRepository]):
     """
 
     NAME = SERVICES.CONTACT
+    DEFAULT_LIST_LIMIT = PAGINATION.CONTACTS_PAGE_SIZE
+    MAX_LIST_LIMIT = PAGINATION.CONTACTS_PAGE_SIZE
+
+    def get(self, contact_id: int) -> Contact:
+        """Get a contact by ID.
+
+        Args:
+            contact_id: Contact identifier.
+
+        Returns:
+            The contact entity.
+
+        Raises:
+            AppWarning: If contact is not found.
+        """
+        contact = self._repo.get(contact_id)
+        if not contact:
+            raise AppWarning(
+                code="CONTACT_NOT_FOUND",
+                origin="ContactService.get",
+            )
+        return contact
 
     def create(
         self, first_name: str, last_name: str, email: str, phone: str
@@ -227,6 +260,41 @@ class ContactService(BaseService[ContactRepository]):
                 origin="ContactService.list_all",
             )
         return contacts
+
+    def list_contacts(
+        self, limit: int = DEFAULT_LIST_LIMIT, offset: int = 0
+    ) -> ContactPage:
+        """List contacts using pagination metadata.
+
+        Args:
+            limit: Requested page size (clamped to ``MAX_LIST_LIMIT``).
+            offset: Zero-based index of the first element to return.
+
+        Returns:
+            A paginated contacts page with metadata.
+
+        Raises:
+            AppWarning: If no contacts exist in the system.
+        """
+        limit = self._normalize_limit(limit)
+        offset = max(0, offset)
+
+        contacts = self._repo.list_all()
+        if not contacts:
+            raise AppWarning(
+                code="EMPTY_CONTACT_LIST",
+                origin="ContactService.list_contacts",
+            )
+
+        total = len(contacts)
+        page = contacts[offset : (offset + limit)]
+        return ContactPage(contacts=page, total=total, limit=limit, offset=offset)
+
+    def _normalize_limit(self, limit: int) -> int:
+        """Normalize list limit ensuring a positive bounded value."""
+        if limit <= 0:
+            return self.DEFAULT_LIST_LIMIT
+        return min(limit, self.MAX_LIST_LIMIT)
 
     def delete(self, contact_id: int) -> bool:
         """Delete a contact by ID.

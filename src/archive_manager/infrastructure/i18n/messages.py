@@ -118,7 +118,7 @@ class I18nMessages:
     @classmethod
     def codes(cls) -> list[str]:
         """Return sorted list of cached message codes."""
-        codes = set()
+        codes: set[str] = set()
         with cls.__lock:
             for key in cls.__cache:
                 codes.add(key[1])
@@ -149,7 +149,7 @@ class I18nMessages:
             if (file_path_global, code) in cls.__cache:
                 return cls.__cache[(file_path_global, code)]
 
-            # Fallback chain: service → global → default-service → default-global
+            # Fallback chain: service -> global -> default-service -> default-global
             candidates: list[Path] = [file_path]
             if cls._SERVICE:
                 candidates.append(file_path_global)

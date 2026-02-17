@@ -1,4 +1,14 @@
 repos:
+  # Full quality gate before pushing
+  - repo: local
+    hooks:
+      - id: full-check-pre-push
+        name: full-check-pre-push
+        entry: python -c "import subprocess, os; cmd = 'powershell' if os.name == 'nt' else 'pwsh'; subprocess.run([cmd, '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', './tasks.ps1', 'check'], check=True)"
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
   # Ruff - Fast Python linter and formatter (replaces black, isort, flake8)
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.0

@@ -6,6 +6,7 @@ Call ``I18nTables.configure(i18n_settings)`` at application startup.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
@@ -54,7 +55,11 @@ class I18nTable:
 
 
 class I18nTables:
-    """Resolves table definitions from JSON files."""
+    """Resolves table definitions from JSON files.
+
+    Cached table instances are never exposed directly; callers receive a
+    defensive deep copy to avoid shared-state mutations.
+    """
 
     _SERVICE: ClassVar[str] = ""
     _i18n: ClassVar[I18nSettings | None] = None
@@ -87,7 +92,7 @@ class I18nTables:
     @classmethod
     def names(cls) -> list[str]:
         """Return sorted list of cached table names."""
-        names = set()
+        names: set[str] = set()
         with cls.__lock:
             for key in cls.__cache:
                 names.add(key[1])
@@ -95,7 +100,10 @@ class I18nTables:
 
     @classmethod
     def _load_table(cls, language: str, table_name: str) -> I18nTable:
-        """Load and cache a table definition from its JSON file."""
+        """Load and cache a table definition from its JSON file.
+
+        Returns a deep copy so callers cannot mutate the shared cache.
+        """
         i18n = cls._get_i18n()
         file_path = i18n.get_file_path(
             language, cls._SERVICE, filename="tables.json"
@@ -107,7 +115,7 @@ class I18nTables:
                 lock = cls.__file_locks[file_path]
         with lock:
             if (file_path, table_name) in cls.__cache:
-                return cls.__cache[(file_path, table_name)]
+                return deepcopy(cls.__cache[(file_path, table_name)])
             data = cls.__loader.get_i18ntable(file_path, table_name)
             if data is not None:
                 i18ntable = I18nTable(
@@ -116,7 +124,7 @@ class I18nTables:
                     footer=data.get("footer", ""),
                 )
                 cls.__cache[(file_path, table_name)] = i18ntable
-                return i18ntable
+                return deepcopy(i18ntable)
         raise AppException(
             code="TABLE_NOT_FOUND",
             origin="I18nTables._load_table",

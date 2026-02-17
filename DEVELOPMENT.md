@@ -1,4 +1,4 @@
-﻿# Development Guide
+# Development Guide
 
 This document describes the development environment setup, project
 conventions, and workflows for contributing to the project.
@@ -33,7 +33,7 @@ archive-manager
 Or run the module directly:
 
 ```bash
-python -m archive_manager.cli
+archive-manager cli
 ```
 
 ## Testing
@@ -59,6 +59,15 @@ Tests are organised by layer under `tests/`:
 
 Integration tests use an in-memory SQLite database for fast, isolated
 execution.
+
+Contact module behaviors covered by tests include:
+
+- Create contact.
+- Read and display contact detail.
+- Update and soft-delete contact.
+- Search by name, email, and phone.
+- List contacts with bounded pagination (`limit` default/max: 20), including
+  page counters and visible range metadata.
 
 ## Linting and Formatting
 
@@ -117,7 +126,7 @@ The project enforces strict dependency boundaries between layers:
 | `application/` | `core/` only |
 | `infrastructure/` | `core/` only |
 | `adapters/` | `core/`, `application/`, `infrastructure/` |
-| `cli.py` | All layers (wiring root) |
+| `adapters/cli/main.py` | All layers (CLI wiring root) |
 
 Within a package, two conventions apply:
 
@@ -131,26 +140,27 @@ Within a package, two conventions apply:
 
 1. Define the interface (protocol) in `core/interfaces/`.
 2. Implement it in `infrastructure/` or `adapters/`.
-3. Wire it in `cli.py`.
+3. Wire it in `adapters/cli/main.py`.
 
 Abstract base classes that depend on external libraries (e.g. SQLAlchemy)
 belong in `infrastructure/`, not in `core/interfaces/`.
 
 ## Naming Conventions
 
-- **Protocols**: Named after the concept (`Service`, `Controller`,
-  `Repository`, `Entity`, `DBConnection`).
+- **Protocols**: Named after the concept (`Service`, `Repository`,
+  `Entity`, `DBConnection`).
 - **Abstract base classes**: Prefixed with `Base` (`BaseService`,
-  `BaseCslController`, `BaseEntity`, `BaseContactRepository`, `BaseState`).
+  `BaseEntity`, `BaseContactRepository`, `BaseState`).
 - **Concrete classes**: Named after the implementation
-  (`ContactService`, `ContactCslController`, `SqliteContactRepository`).
+  (`ContactService`, `SqliteContactRepository`).
 - **Filenames**: Follow the class name in snake_case (`base_service.py`,
   `contact_service.py`).
 - **Singular form**: All names use singular form (`Contact`, not `Contacts`).
 
 ## Dependency Injection
 
-`Settings` is created once in `cli.py` and injected into every component.
+`Settings` is created once in `adapters/cli/main.py` and injected into every
+component.
 There is no global singleton. I18n classes are configured once at startup
 via class-level `configure(i18n_settings)` calls.
 
@@ -216,6 +226,14 @@ modifying a message key:
 1. Update the key in every language directory (`en/`, `es/`).
 2. Run `python -m pytest tests/unit/i18n/test_i18n_sync.py` to verify
    consistency.
+
+Caching and mutation rules:
+
+- `I18nMessageLoader`, `I18nMenusLoader`, and `I18nTablesLoader` cache raw
+  JSON dictionaries by file path.
+- `I18nMenus` and `I18nTables` return defensive deep copies of typed objects
+  (`I18nMenu` / `I18nTable`), so UI layers can safely mutate options/headers
+  without contaminating shared cache state.
 
 ## Local Data
 

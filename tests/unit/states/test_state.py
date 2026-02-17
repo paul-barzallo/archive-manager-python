@@ -10,7 +10,9 @@ Tests cover:
 
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -29,7 +31,7 @@ from archive_manager.core.errors import (
 
 
 @pytest.fixture
-def mock_ui():
+def mock_ui() -> MagicMock:
     """Create mock UI with common methods."""
     ui = MagicMock()
     ui.print_errors = MagicMock()
@@ -40,7 +42,7 @@ def mock_ui():
 
 
 @pytest.fixture
-def mock_session():
+def mock_session() -> MagicMock:
     """Create mock session with language."""
     session = MagicMock()
     session.language = "en"
@@ -48,15 +50,19 @@ def mock_session():
 
 
 @pytest.fixture
-def mock_controller():
-    """Create mock controller."""
+def mock_service() -> MagicMock:
+    """Create mock service."""
     return MagicMock()
 
 
 @pytest.fixture
-def mock_context(mock_session, mock_ui, mock_controller):
+def mock_context(
+    mock_session: MagicMock,
+    mock_ui: MagicMock,
+    mock_service: MagicMock,
+) -> AppContext[Any, Any]:
     """Create mock application context."""
-    return AppContext(session=mock_session, ui=mock_ui, controller=mock_controller)
+    return AppContext(session=mock_session, ui=mock_ui, service=mock_service)
 
 
 # ==============================================================================
@@ -67,18 +73,23 @@ def mock_context(mock_session, mock_ui, mock_controller):
 class ConcreteState(BaseState):
     """Concrete implementation of BaseState for testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize test state with error simulation parameters."""
         self.call_count = 0
         self.should_raise: BaseException | None = None
         self.raise_times: int = 0
 
-    def run(self, ctx: AppContext) -> BaseState | None:
+    def run(self, ctx: AppContext[Any, Any]) -> BaseState | None:
         """Simple run method for testing."""
         return None
 
+    @staticmethod
+    def format_issue_for_test(issue: AppException) -> str:
+        """Expose protected formatter for test assertions."""
+        return str(BaseState._format_app_issue(issue))
+
     @BaseState.handle_errors
-    def action_with_errors(self, ctx: AppContext) -> str:
+    def action_with_errors(self, ctx: AppContext[Any, Any]) -> str:
         """Action that may raise errors for testing handle_errors."""
         self.call_count += 1
 
@@ -96,20 +107,19 @@ class ConcreteState(BaseState):
 class TestStateBasic:
     """Tests for basic State functionality."""
 
-    def test_state_is_abstract(self):
+    def test_state_is_abstract(self) -> None:
         """BaseState cannot be instantiated directly."""
-        with pytest.raises(TypeError):
-            BaseState()  # type: ignore
+        assert inspect.isabstract(BaseState)
 
-    def test_state_subclass_can_be_instantiated(self):
+    def test_state_subclass_can_be_instantiated(self) -> None:
         """BaseState subclass with run method can be instantiated."""
         state = ConcreteState()
         assert state is not None
 
-    def test_format_app_issue_with_code_and_origin(self):
+    def test_format_app_issue_with_code_and_origin(self) -> None:
         """Format app issue includes code and origin."""
         issue = AppError("TEST_ERROR", origin="TestService.method")
-        result = BaseState._format_app_issue(issue)
+        result = ConcreteState.format_issue_for_test(issue)
 
         assert "TestService.method" in result
         assert "TEST_ERROR" in result
@@ -123,7 +133,7 @@ class TestStateBasic:
 class TestHandleErrorsDecorator:
     """Tests for the @handle_errors decorator."""
 
-    def test_successful_execution(self, mock_context):
+    def test_successful_execution(self, mock_context: AppContext[Any, Any]) -> None:
         """Successful execution returns result without UI interaction."""
         state = ConcreteState()
 
@@ -134,7 +144,9 @@ class TestHandleErrorsDecorator:
         mock_context.ui.print_errors.assert_not_called()
         mock_context.ui.print_error.assert_not_called()
 
-    def test_validation_errors_retry_once_then_succeed(self, mock_context):
+    def test_validation_errors_retry_once_then_succeed(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """Validation errors show errors and retry."""
         state = ConcreteState()
         errors = [AppError(code="TEST_ERROR", origin="test", field="test")]
@@ -148,7 +160,9 @@ class TestHandleErrorsDecorator:
         mock_context.ui.print_errors.assert_called_once()
         mock_context.ui.pause.assert_called()
 
-    def test_validation_errors_retry_multiple_times(self, mock_context):
+    def test_validation_errors_retry_multiple_times(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """Validation errors retry until success."""
         state = ConcreteState()
         errors = [AppError(code="TEST_ERROR", origin="test", field="test")]
@@ -161,7 +175,9 @@ class TestHandleErrorsDecorator:
         assert state.call_count == 4
         assert mock_context.ui.print_errors.call_count == 3
 
-    def test_warning_retries_then_succeeds(self, mock_context):
+    def test_warning_retries_then_succeeds(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """Warnings show warning and retry."""
         state = ConcreteState()
         state.should_raise = AppWarning(
@@ -175,7 +191,9 @@ class TestHandleErrorsDecorator:
         assert state.call_count == 2
         mock_context.ui.print_warning.assert_called_once()
 
-    def test_app_error_aborts_operation(self, mock_context):
+    def test_app_error_aborts_operation(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """AppError shows error and returns None (abort)."""
         state = ConcreteState()
         state.should_raise = AppError("TEST_ERROR", origin="test")
@@ -187,7 +205,9 @@ class TestHandleErrorsDecorator:
         assert state.call_count == 1  # No retry
         mock_context.ui.print_error.assert_called_once()
 
-    def test_app_exception_aborts_with_generic_error(self, mock_context):
+    def test_app_exception_aborts_with_generic_error(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """AppException shows generic error and aborts."""
         state = ConcreteState()
         state.should_raise = AppException("DB_ERROR", origin="test")
@@ -200,7 +220,9 @@ class TestHandleErrorsDecorator:
         assert state.call_count == 1
         mock_context.ui.print_error.assert_called_once_with("en", "UNKNOWN_ERROR")
 
-    def test_unhandled_exception_aborts_with_generic_error(self, mock_context):
+    def test_unhandled_exception_aborts_with_generic_error(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """Unhandled exceptions show generic error and abort."""
         state = ConcreteState()
         state.should_raise = RuntimeError("Unexpected error")
@@ -213,7 +235,9 @@ class TestHandleErrorsDecorator:
         assert state.call_count == 1
         mock_context.ui.print_error.assert_called_once_with("en", "UNKNOWN_ERROR")
 
-    def test_keyboard_interrupt_propagates(self, mock_context):
+    def test_keyboard_interrupt_propagates(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """KeyboardInterrupt is not caught."""
         state = ConcreteState()
         state.should_raise = KeyboardInterrupt()
@@ -222,7 +246,7 @@ class TestHandleErrorsDecorator:
         with pytest.raises(KeyboardInterrupt):
             state.action_with_errors(mock_context)
 
-    def test_system_exit_propagates(self, mock_context):
+    def test_system_exit_propagates(self, mock_context: AppContext[Any, Any]) -> None:
         """SystemExit is not caught."""
         state = ConcreteState()
         state.should_raise = SystemExit(0)
@@ -240,16 +264,16 @@ class TestHandleErrorsDecorator:
 class TestStateFlow:
     """Tests for state machine flow patterns."""
 
-    def test_state_returns_next_state(self, mock_context):
+    def test_state_returns_next_state(self, mock_context: AppContext[Any, Any]) -> None:
         """State can return next state for transition."""
 
         @dataclass
         class NextState(BaseState):
-            def run(self, ctx) -> BaseState | None:
+            def run(self, ctx: AppContext[Any, Any]) -> BaseState | None:
                 return None
 
         class InitialState(BaseState):
-            def run(self, ctx) -> BaseState | None:
+            def run(self, ctx: AppContext[Any, Any]) -> BaseState | None:
                 return NextState()
 
         state = InitialState()
@@ -257,11 +281,13 @@ class TestStateFlow:
 
         assert isinstance(next_state, NextState)
 
-    def test_state_returns_none_to_exit(self, mock_context):
+    def test_state_returns_none_to_exit(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """State returning None signals exit."""
 
         class ExitState(BaseState):
-            def run(self, ctx) -> BaseState | None:
+            def run(self, ctx: AppContext[Any, Any]) -> BaseState | None:
                 return None
 
         state = ExitState()
@@ -269,14 +295,16 @@ class TestStateFlow:
 
         assert result is None
 
-    def test_state_returns_self_for_loop(self, mock_context):
+    def test_state_returns_self_for_loop(
+        self, mock_context: AppContext[Any, Any]
+    ) -> None:
         """State returning self continues on same state."""
 
         class LoopState(BaseState):
-            def __init__(self):
+            def __init__(self) -> None:
                 self.iterations = 0
 
-            def run(self, ctx) -> BaseState | None:
+            def run(self, ctx: AppContext[Any, Any]) -> BaseState | None:
                 self.iterations += 1
                 if self.iterations < 3:
                     return self

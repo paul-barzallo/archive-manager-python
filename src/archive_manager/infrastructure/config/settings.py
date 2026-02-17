@@ -12,7 +12,7 @@ import logging
 import sys
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import yaml
 from pydantic import Field, field_validator
@@ -80,6 +80,16 @@ class LoggingSettings(BaseSettings):
             Path object.
         """
         return Path(v) if isinstance(v, str) else v
+
+
+class ApiSettings(BaseSettings):
+    """API server settings."""
+
+    model_config = SettingsConfigDict(extra="ignore")
+
+    host: str = Field(default="127.0.0.1")
+    port: int = Field(default=8000, ge=1, le=65535)
+    reload: bool = Field(default=False)
 
 
 class I18nSettings(BaseSettings):
@@ -248,6 +258,7 @@ class Settings(BaseSettings):
     )
 
     database: DatabaseSettings = Field(default_factory=DatabaseSettings)
+    api: ApiSettings = Field(default_factory=ApiSettings)
     logging: LoggingSettings = Field(default_factory=LoggingSettings)
     i18n: I18nSettings = Field(default_factory=I18nSettings)
 
@@ -321,7 +332,10 @@ class Settings(BaseSettings):
                 and isinstance(result[key], dict)
                 and isinstance(value, dict)
             ):
-                result[key] = Settings._deep_merge(result[key], value)
+                result[key] = Settings._deep_merge(
+                    cast(dict[str, Any], result[key]),
+                    cast(dict[str, Any], value),
+                )
             else:
                 result[key] = value
         return result

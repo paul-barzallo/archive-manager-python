@@ -42,6 +42,20 @@ class ContactRepository(Repository, Protocol):
         """
         ...
 
+    def get(self, contact_id: int) -> Contact | None:
+        """Find a contact by its identifier.
+
+        Args:
+            contact_id: Unique identifier of the contact.
+
+        Returns:
+            Contact | None: Matching contact if found, otherwise None.
+
+        Raises:
+            AppInfrastructureError: If persistence fails.
+        """
+        ...
+
     def find_by_name(self, full_name: str) -> Sequence[Contact]:
         """Find contacts by full name with partial matching.
 

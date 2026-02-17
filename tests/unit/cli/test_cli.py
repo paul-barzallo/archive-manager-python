@@ -11,14 +11,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from archive_manager.adapters.cli import ContactCslController
+from archive_manager.adapters.cli import create_context, run
 from archive_manager.adapters.cli.states import (
     AppContext,
     BaseState,
     MainContactMenuState,
 )
 from archive_manager.adapters.cli.ui import ContactCslUI
-from archive_manager.cli import create_context, run
+from archive_manager.application.services import ContactService
 from archive_manager.infrastructure.config import (
     DEFAULT_LANGUAGE,
     Session,
@@ -54,11 +54,11 @@ class TestCreateContext:
 
         assert isinstance(ctx.ui, ContactCslUI)
 
-    def test_create_context_has_controller(self) -> None:
-        """Verify context has a ContactCslController instance."""
+    def test_create_context_has_service(self) -> None:
+        """Verify context has a ContactService instance."""
         ctx = create_context()
 
-        assert isinstance(ctx.controller, ContactCslController)
+        assert isinstance(ctx.service, ContactService)
 
 
 class TestRun:
@@ -83,7 +83,7 @@ class TestRun:
         mock_state1.run.return_value = mock_state2
 
         with patch(
-            "archive_manager.cli.MainContactMenuState",
+            "archive_manager.adapters.cli.main.MainContactMenuState",
             return_value=mock_state1,
         ):
             run(ctx)
@@ -138,13 +138,13 @@ class TestAppContext:
         """Verify AppContext can be instantiated with components."""
         session = Session()
         ui = MagicMock(spec=ContactCslUI)
-        controller = MagicMock(spec=ContactCslController)
+        service = MagicMock(spec=ContactService)
 
-        ctx = AppContext(session, ui, controller)
+        ctx = AppContext(session, ui, service)
 
         assert ctx.session is session
         assert ctx.ui is ui
-        assert ctx.controller is controller
+        assert ctx.service is service
 
 
 class TestCLIComponents:
@@ -167,15 +167,15 @@ class TestCLIComponents:
 class TestCLIMain:
     """Test CLI main function behavior."""
 
-    @patch("archive_manager.cli.create_context")
-    @patch("archive_manager.cli.run")
+    @patch("archive_manager.adapters.cli.main.create_context")
+    @patch("archive_manager.adapters.cli.main.run")
     def test_main_calls_create_context_and_run(
         self,
         mock_run: MagicMock,
         mock_create_context: MagicMock,
     ) -> None:
         """Verify main() calls `create_context()` and `run()`."""
-        from archive_manager.cli import main
+        from archive_manager.adapters.cli import main
 
         mock_ctx = MagicMock()
         mock_create_context.return_value = mock_ctx
@@ -185,13 +185,13 @@ class TestCLIMain:
         mock_create_context.assert_called_once()
         mock_run.assert_called_once_with(mock_ctx)
 
-    @patch("archive_manager.cli.create_context")
+    @patch("archive_manager.adapters.cli.main.create_context")
     def test_main_keyboard_interrupt(
         self,
         mock_create_context: MagicMock,
     ) -> None:
         """Verify main() handles KeyboardInterrupt gracefully."""
-        from archive_manager.cli import main
+        from archive_manager.adapters.cli import main
 
         mock_create_context.side_effect = KeyboardInterrupt()
 

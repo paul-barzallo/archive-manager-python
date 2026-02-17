@@ -19,7 +19,7 @@ class TestCoreImports:
 
     def test_cli_import(self) -> None:
         """Test CLI module can be imported."""
-        from archive_manager.cli import main
+        from archive_manager.adapters.cli import main
 
         assert callable(main)
 
@@ -57,13 +57,11 @@ class TestDomainImports:
         """Test interface (protocol) exports."""
         from archive_manager.core.interfaces import (
             ContactRepository,
-            Controller,
             DBConnection,
             Repository,
             Service,
         )
 
-        assert Controller is not None
         assert ContactRepository is not None
         assert DBConnection is not None
         assert Repository is not None
@@ -85,9 +83,10 @@ class TestApplicationImports:
 
     def test_dto_import(self) -> None:
         """Test DTO module exports."""
-        from archive_manager.application.dto import ContactDTO
+        from archive_manager.application.dto import ContactDTO, ContactPageDTO
 
         assert ContactDTO is not None
+        assert ContactPageDTO is not None
 
 
 class TestInfrastructureImports:
@@ -174,11 +173,13 @@ class TestI18nImports:
 class TestAdapterImports:
     """Test adapter layer imports."""
 
-    def test_cli_controllers_import(self) -> None:
-        """Test CLI controller module exports."""
-        from archive_manager.adapters.cli import ContactCslController
+    def test_cli_adapter_import(self) -> None:
+        """Test CLI adapter exports."""
+        from archive_manager.adapters.cli import create_context, main, run
 
-        assert ContactCslController is not None
+        assert callable(main)
+        assert callable(create_context)
+        assert callable(run)
 
     def test_cli_ui_import(self) -> None:
         """Test CLI UI module exports."""
@@ -198,6 +199,19 @@ class TestAdapterImports:
         assert AppContext is not None
         assert MainContactMenuState is not None
         assert BaseState is not None
+
+    def test_api_adapter_import(self) -> None:
+        """Test API adapter exports."""
+        from archive_manager.adapters.api import create_app, run
+
+        assert callable(create_app)
+        assert callable(run)
+
+    def test_api_router_import(self) -> None:
+        """Test API router export."""
+        from archive_manager.adapters.api.routers import contacts_router
+
+        assert contacts_router is not None
 
 
 class TestThirdPartyDependencies:
@@ -256,6 +270,15 @@ class TestThirdPartyDependencies:
         assert mapped_column is not None
         assert sessionmaker is not None
         assert QueuePool is not None
+
+    def test_fastapi_import(self) -> None:
+        """Test FastAPI library imports."""
+        from fastapi import APIRouter, FastAPI
+        from fastapi.testclient import TestClient
+
+        assert FastAPI is not None
+        assert APIRouter is not None
+        assert TestClient is not None
 
     def test_decorator_import(self) -> None:
         """Test decorator library import."""

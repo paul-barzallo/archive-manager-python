@@ -17,6 +17,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Generator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -33,7 +34,7 @@ if str(SRC) not in sys.path:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def _configure_i18n():
+def _configure_i18n() -> Generator[None, None, None]:
     """Configure i18n subsystem once for the whole test session."""
     from archive_manager.infrastructure.config import Settings
     from archive_manager.infrastructure.i18n import I18nMenus, I18nMessages, I18nTables
@@ -46,7 +47,7 @@ def _configure_i18n():
 
 
 @pytest.fixture(scope="session")
-def test_settings():
+def test_settings() -> Any:
     """Create test-optimized settings (session-scoped for performance)."""
     from archive_manager.infrastructure.config import Settings
 
@@ -59,7 +60,7 @@ def test_settings():
 
 
 @pytest.fixture
-def sqlite_connection():
+def sqlite_connection() -> Generator[Any, None, None]:
     """Create a fresh in-memory SQLite connection for each test.
 
     This fixture provides complete isolation between tests by using
@@ -73,7 +74,7 @@ def sqlite_connection():
 
 
 @pytest.fixture
-def sql_repository(sqlite_connection):
+def sql_repository(sqlite_connection: Any) -> Any:
     """Create a SQL repository with in-memory database for testing."""
     from archive_manager.infrastructure.persistence import SqliteContactRepository
 
@@ -86,7 +87,7 @@ def sql_repository(sqlite_connection):
 
 
 @pytest.fixture
-def service(sql_repository):
+def service(sql_repository: Any) -> Any:
     """Create a ContactService with SQL repository."""
     from archive_manager.application.services import ContactService
 
@@ -99,7 +100,7 @@ def service(sql_repository):
 
 
 @pytest.fixture
-def sample_contact():
+def sample_contact() -> Any:
     """Create a basic sample contact for testing."""
     from archive_manager.core.entities import Contact
 
@@ -112,7 +113,7 @@ def sample_contact():
 
 
 @pytest.fixture
-def sample_contacts(sql_repository) -> Generator[list, None, None]:
+def sample_contacts(sql_repository: Any) -> Generator[list[Any], None, None]:
     """Create multiple sample contacts in the database.
 
     Returns a list of 5 contacts with various characteristics:
@@ -132,28 +133,15 @@ def sample_contacts(sql_repository) -> Generator[list, None, None]:
         ("david", "müller", "david@example.com", "+49123456789"),
     ]
 
-    created = []
+    created: list[Any] = []
     for first, last, email, phone in contacts_data:
         contact = Contact.create(
             first_name=first, last_name=last, email=email, phone=phone
         )
-        saved = sql_repository.add(contact)
+        saved: Any = sql_repository.add(contact)
         created.append(saved)
 
     yield created
-
-
-# ==============================================================================
-# Controller Fixtures
-# ==============================================================================
-
-
-@pytest.fixture
-def controller(service):
-    """Create a ContactCslController with injected service."""
-    from archive_manager.adapters.cli import ContactCslController
-
-    return ContactCslController(service=service)
 
 
 # ==============================================================================
@@ -161,7 +149,7 @@ def controller(service):
 # ==============================================================================
 
 
-def pytest_configure(config):
+def pytest_configure(config: Any) -> None:
     """Register custom markers."""
     config.addinivalue_line("markers", "unit: Unit tests for isolated components")
     config.addinivalue_line("markers", "integration: Integration tests across layers")

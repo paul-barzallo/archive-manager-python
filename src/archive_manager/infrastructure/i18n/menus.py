@@ -6,6 +6,7 @@ Call ``I18nMenus.configure(i18n_settings)`` at application startup.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
@@ -80,7 +81,11 @@ class I18nMenu:
 
 
 class I18nMenus:
-    """Resolves menu definitions from JSON files."""
+    """Resolves menu definitions from JSON files.
+
+    Cached menu instances are never exposed directly; callers receive a
+    defensive deep copy so runtime menu mutations stay request-local.
+    """
 
     _SERVICE: ClassVar[str] = ""
     _i18n: ClassVar[I18nSettings | None] = None
@@ -113,7 +118,7 @@ class I18nMenus:
     @classmethod
     def names(cls) -> list[str]:
         """Return sorted list of cached menu names."""
-        names = set()
+        names: set[str] = set()
         with cls.__lock:
             for key in cls.__cache:
                 names.add(key[1])
@@ -121,7 +126,10 @@ class I18nMenus:
 
     @classmethod
     def _load_menu(cls, language: str, menu_name: str) -> I18nMenu:
-        """Load and cache a menu definition from its JSON file."""
+        """Load and cache a menu definition from its JSON file.
+
+        Returns a deep copy so callers can safely mutate dynamic options.
+        """
         i18n = cls._get_i18n()
         file_path = i18n.get_file_path(
             language, cls._SERVICE, filename="menus.json"
@@ -133,7 +141,7 @@ class I18nMenus:
                 lock = cls.__file_locks[file_path]
         with lock:
             if (file_path, menu_name) in cls.__cache:
-                return cls.__cache[(file_path, menu_name)]
+                return deepcopy(cls.__cache[(file_path, menu_name)])
             data = cls.__loader.get_i18nmenu(file_path, menu_name)
             if data is not None:
                 i18nmenu = I18nMenu(
@@ -144,7 +152,7 @@ class I18nMenus:
                     ],
                 )
                 cls.__cache[(file_path, menu_name)] = i18nmenu
-                return i18nmenu
+                return deepcopy(i18nmenu)
         raise AppException(
             code="MENU_NOT_FOUND",
             origin="I18nMenus._load_menu",
@@ -177,3 +185,8 @@ class ContactI18nMenus(I18nMenus):
     def contact_menu(cls, language: str) -> I18nMenu:
         """Return the single-contact action menu for the given language."""
         return cls._load_menu(language, "contact_menu")
+
+    @classmethod
+    def contact_pagination_menu(cls, language: str) -> I18nMenu:
+        """Return the contact-list pagination menu for the given language."""
+        return cls._load_menu(language, "contact_pagination_menu")

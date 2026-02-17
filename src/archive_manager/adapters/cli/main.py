@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
-"""Application entry point for the contact manager.
+"""Application entry point for the CLI adapter."""
 
-Orchestrates the application: creates components via dependency injection,
-configures i18n, and runs the main state machine loop.
-
-All dependencies are wired here — no module uses ``get_settings()`` singletons.
-"""
+from __future__ import annotations
 
 import logging
 import sys
 
-from archive_manager.adapters.cli import ContactCslController
-from archive_manager.adapters.cli.states import (
+from archive_manager.adapters.cli.states.contact_states import (
     AppContext,
     BaseState,
     MainContactMenuState,
 )
-from archive_manager.adapters.cli.ui import ContactCslUI
-from archive_manager.application.services import ContactService
+from archive_manager.adapters.cli.ui.contact_csl_ui import ContactCslUI
+from archive_manager.application.services.contact_service import ContactService
 from archive_manager.infrastructure.config import (
     DEFAULT_LANGUAGE,
     Session,
@@ -34,16 +29,16 @@ from archive_manager.infrastructure.persistence.db import SqliteConnection
 logger = logging.getLogger(__name__)
 
 # Type alias for contact context
-ContactContext = AppContext[ContactCslUI, ContactCslController]
+ContactContext = AppContext[ContactCslUI, ContactService]
 
 
 def create_context() -> ContactContext:
     """Create the application context with all dependencies.
 
-    Wires all components via constructor injection.  No global singletons.
+    Wires all components via constructor injection. No global singletons.
 
     Returns:
-        Configured AppContext with session, UI, and controller.
+        Configured AppContext with session, UI, and service.
     """
     settings = Settings()
 
@@ -60,17 +55,16 @@ def create_context() -> ContactContext:
     connection = SqliteConnection(settings.database)
     repo = SqliteContactRepository(connection)
     service = ContactService(repo)
-    controller = ContactCslController(service)
     ui = ContactCslUI()
 
-    return AppContext(session, ui, controller)
+    return AppContext(session, ui, service)
 
 
 def run(ctx: ContactContext) -> None:
     """Run the state machine loop.
 
     Args:
-        ctx: Application context with session, UI, and controller.
+        ctx: Application context with session, UI, and service.
     """
     state: BaseState | None = MainContactMenuState()
 

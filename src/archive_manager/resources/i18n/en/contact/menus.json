@@ -20,6 +20,23 @@
             }
         ]
     },
+    "contact_pagination_menu": {
+        "title": "Navigate contact list:",
+        "options": [
+            {
+                "id": "previous",
+                "text": "Previous page"
+            },
+            {
+                "id": "next",
+                "text": "Next page"
+            },
+            {
+                "id": "return",
+                "text": "Return"
+            }
+        ]
+    },
     "find_contact_menu": {
         "title": "Do you want to search the contact by first and last name or by email?",
         "options": [

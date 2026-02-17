@@ -1,4 +1,4 @@
-﻿# Architecture
+# Architecture
 
 ## Overview
 
@@ -40,7 +40,6 @@ The domain layer. It has no external dependencies.
   - `Repository`: Marker protocol for all repositories.
   - `ContactRepository`: Protocol defining CRUD and search operations.
   - `Service`: Protocol contract for application services.
-  - `Controller`: Protocol contract for controllers.
   - `DBConnection`: Protocol contract for database connections.
 
 ### 2. Application (`application/`)
@@ -54,7 +53,9 @@ Use-case and business-rule layer. Depends only on `core/`.
     and canonical phone search.
   - `policies/ContactPolicy`: Uniqueness rules evaluated before persistence.
 - **`dto/`**
-  - `ContactDTO`: Data-transfer object for the controller-service boundary.
+  - `ContactDTO`: Data-transfer object for adapter-service boundaries.
+  - `ContactPageDTO`: Paginated list response DTO (`contacts`, `total`,
+    `limit`, `offset`) with derived metadata for consumers.
 
 ### 3. Infrastructure (`infrastructure/`)
 
@@ -84,14 +85,13 @@ Depends only on `core/`.
 Delivery mechanisms. Currently provides a CLI adapter.
 
 - **`cli/`**
-  - `BaseCslController(ABC, Controller, Generic[TService])`: Abstract
-    controller base satisfying the `Controller` protocol.
-  - `ContactCslController`: Controller for contact operations.
+  - `main.py`: CLI composition root and dependency wiring.
   - `states/BaseState`: State-machine base with `@handle_errors` decorator.
-  - `states/contact_states.py`: Concrete states (menus, create, search,
-    edit, delete).
+  - `states/contact_states.py`: Concrete states calling `ContactService`
+    directly (menus, create, search, edit, delete, list pagination).
   - `ui/CslUI`: Rich-based console UI (menus, tables, prompts).
-  - `ui/ContactCslUI`: Contact-specific UI with i18n integration.
+  - `ui/ContactCslUI`: Contact-specific UI with paginated table footer and
+    list navigation actions.
 
 ## Entity Factory Pattern
 
@@ -122,11 +122,11 @@ Validation is enforced at three levels:
 
 ## Dependency Injection
 
-`Settings` is created once in `cli.py` and passed to every component that
-requires configuration. There is no global singleton.
+`Settings` is created once in `adapters/cli/main.py` and passed to every
+component that requires configuration. There is no global singleton.
 
 ```text
-cli.py
+adapters/cli/main.py
 |-- Settings()
 |-- I18nMessages.configure(settings.i18n)
 |-- I18nMenus.configure(settings.i18n)
@@ -134,16 +134,15 @@ cli.py
 |-- SqliteConnection(settings.database)
 |   +-- SqliteContactRepository(connection)
 |       +-- ContactService(repository)
-|           +-- ContactCslController(service)
 +-- ContactCslUI()
-+-- AppContext(session, ui, controller)
++-- AppContext(session, ui, service)
 +-- run(context)
 ```
 
 ## Data Flow
 
 ```text
-State Machine --> Controller --> Service --> Repository --> ORM --> SQLite
+State Machine --> Service --> Repository --> ORM --> SQLite
       |                                                      ^
       +-- UI (Rich) --> i18n loaders --> JSON resources       |
                                                               |
@@ -154,11 +153,14 @@ State Machine --> Controller --> Service --> Repository --> ORM --> SQLite
 
 - Resources are shipped inside the package under `resources/i18n/<lang>/`.
 - Each language directory contains three subdirectories: `visual/` (prompts,
-  labels), `output/` (error and success messages), and one directory per
+  labels), `output/` (error, warning, and success messages), and one directory per
   service module (e.g. `contact/` for menus and tables).
 - I18n classes (`I18nMessages`, `I18nMenus`, `I18nTables`) are configured
   once at startup via `configure(i18n_settings)` and resolve messages
   through a thread-safe cache.
+- Loader classes cache raw JSON mappings; typed menu/table resolvers return
+  defensive copies of `I18nMenu` and `I18nTable` so dynamic UI mutations do
+  not leak into shared cache state.
 - Log messages are always written in English regardless of the user
   interface language.
 

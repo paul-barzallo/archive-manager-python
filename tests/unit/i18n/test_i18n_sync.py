@@ -42,6 +42,13 @@ def test_menus_json_exists():
         assert isinstance(data, dict)
 
 
+def test_contact_menus_sync_between_languages():
+    """Verify that contact menu keys are synchronized between EN and ES."""
+    es = _keys(RESOURCES / "es" / "contact" / "menus.json")
+    en = _keys(RESOURCES / "en" / "contact" / "menus.json")
+    assert es == en, "Mismatch in contacts/menus.json"
+
+
 def test_tables_json_exists():
     """Verify that tables.json exists for both languages."""
     for lang in ["en", "es"]:

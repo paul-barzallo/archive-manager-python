@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 
 from InquirerPy.prompts.input import InputPrompt
 from InquirerPy.prompts.list import ListPrompt
@@ -114,7 +114,7 @@ class CslUI:
             language: Language code for i18n.
             errors: Sequence of error dicts mapping codes to kwargs.
         """
-        error_messages = []
+        error_messages: list[str] = []
         for err in errors:
             for code, kwargs in err.items():
                 error_messages.append(
@@ -260,17 +260,20 @@ class CslUI:
         Returns:
             `True` if user confirms, `False` otherwise.
         """
-        choices: Sequence[dict[str, str | bool] | Separator] = [
-            Separator(self._I18N.confirm(language, confirm_code)),
-            Separator(""),
-            {"name": f"{self._I18N.confirm(language, 'YES')}", "value": True},
-            {"name": f"{self._I18N.confirm(language, 'NO')}", "value": False},
-        ]
+        choices: list[dict[str, Any]] = cast(
+            list[dict[str, Any]],
+            [
+                Separator(self._I18N.confirm(language, confirm_code)),
+                Separator(""),
+                {"name": f"{self._I18N.confirm(language, 'YES')}", "value": True},
+                {"name": f"{self._I18N.confirm(language, 'NO')}", "value": False},
+            ],
+        )
 
         return bool(
             ListPrompt(
                 message="",
-                choices=choices,  # type: ignore[arg-type]
+                choices=choices,
                 qmark="",
                 amark="",
                 pointer=">",
@@ -292,26 +295,31 @@ class CslUI:
         self._console.print()
         Prompt.ask(f" [dim]{message} [/dim]", console=self._console, show_default=False)
 
-    def _show_menu(self, menu_config: I18nMenu) -> str:
+    def _show_menu(self, menu_config: I18nMenu, clear_screen: bool = True) -> str:
         """Display a menu and return the selected option ID.
 
         Args:
-            menu_config: MenuConfig instance to display.
+            menu_config: ``I18nMenu`` instance to display.
+            clear_screen: If ``True``, render the banner and clear previous output.
 
         Returns:
             The ID of the selected menu option.
         """
-        self.show_title()
+        if clear_screen:
+            self.show_title()
         return menu_config.prompt_choice(_INQUIRER_STYLE)
 
-    def _show_table(self, table_config: I18nTable, data: Sequence[Any]) -> None:
+    def _show_table(
+        self, table_config: I18nTable, data: Sequence[Any], **kwargs: Any
+    ) -> None:
         """Display a table with the provided data.
 
         Args:
-            table_config: TableConfig instance defining table structure.
+            table_config: ``I18nTable`` instance defining table structure.
             data: Sequence of objects to display in the table.
+            **kwargs: Footer formatting values used by ``I18nTable``.
         """
-        table = table_config.build_table([vars(element) for element in data])
+        table = table_config.build_table([vars(element) for element in data], **kwargs)
         self._console.print()
         self._console.print(Padding(table, (0, 2)))
         self._console.print()
