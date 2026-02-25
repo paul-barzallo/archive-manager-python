@@ -7,7 +7,7 @@
   <a href=".github/workflows/ci.yaml">
     <img src="https://img.shields.io/badge/ci-github%20actions-2088FF?style=flat&logo=githubactions&logoColor=white" alt="CI">
   </a>
-  <a href="ARCHITECTURE.md">
+  <a href="docs/ARCHITECTURE.md">
     <img src="https://img.shields.io/badge/architecture-clean-0A7E8C?style=flat" alt="Clean Architecture">
   </a>
   <a href="LICENSE">
@@ -18,6 +18,40 @@
 Archive Manager is a Python CLI for managing archives through independent,
 extensible modules. The first implemented module focuses on contact management,
 with a structure designed to grow into additional domains over time.
+
+## 🤖 AI Agents Ecosystem
+
+This repository is pioneering an **AI-First Development** approach. We have structured a dedicated ecosystem to help AI agents (like GitHub Copilot or custom subagents) understand, navigate, and contribute to the project autonomously and safely.
+
+> **💡 The Core Principle:** Agents read their instructions from [`AGENTS.md`](AGENTS.md) first, which acts as the central operating manual, routing them to specific rules, workflows, and skills.
+
+### 📂 The `agents/` Directory
+
+This folder contains the "brain" and behavioral constraints for our AI assistants:
+
+* 🚨 **Rules (`agents/reglas/`)**: Strict constraints and guidelines.
+  * *Example:* [`always.md`](agents/reglas/always.md) contains mandatory baseline rules (e.g., "Never run `git push`", "Always run `mypy`").
+* 🔄 **Workflows (`agents/workflows/`)**: Step-by-step standard operating procedures for complex tasks.
+  * *Example:* [`01_feature_delivery_workflow.md`](agents/workflows/01_feature_delivery_workflow.md) guides an agent from planning to testing and documentation.
+* 🧠 **Skills (`agents/skills/`)**: Domain-specific knowledge bases that agents can read to learn how to perform specific technical tasks.
+  * *Example:* [`cloud-functions/SKILL.md`](agents/skills/cloud-functions/SKILL.md) teaches the agent how to handle specific integrations.
+
+### 📚 The `docs/` Directory (Agent Context)
+
+To maintain a shared understanding of the project's architecture, the `docs/` folder contains context files **written by agents, for agents** (and humans!). This prevents AI hallucinations and ensures consistency across sessions:
+
+* 🗺️ [`DOMAIN_MAP.md`](docs/DOMAIN_MAP.md): What modules exist and what they expose.
+* 🌐 [`CORE.md`](docs/CORE.md): Data models and core interfaces.
+* 📏 [`CONVENTIONS.md`](docs/CONVENTIONS.md): Naming, language, and architectural patterns.
+* ⚠️ [`ERRORS.md`](docs/ERRORS.md): Catalog of domain errors.
+* 🛡️ [`SECURITY.md`](docs/SECURITY.md): What to protect and what not to touch.
+* 🔄 [`STATE.md`](docs/STATE.md): Domain states of entities.
+* 📦 [`DEPENDENCIES.md`](docs/DEPENDENCIES.md): External libraries, why they were chosen, and where they live.
+* 🧪 [`TEST_MAP.md`](docs/TEST_MAP.md): What is covered, test types, and fixtures.
+* 🏗️ [`ARCHITECTURE.md`](docs/ARCHITECTURE.md): Layer design, DI strategy, and persistence decisions.
+* 🛠️ [`DEVELOPMENT.md`](docs/DEVELOPMENT.md): Setup, conventions, i18n workflow, and patterns.
+
+---
 
 ## What You Get
 
@@ -34,7 +68,7 @@ with a structure designed to grow into additional domains over time.
 
 ## Requirements
 
-- Python 3.11 or newer
+* Python 3.11 or newer
 
 ## Quick Start
 
@@ -102,8 +136,8 @@ APP_DEBUG=true
 
 SQLite database:
 
-- Created automatically on first run
-- Stored in `data/db/`
+* Created automatically on first run
+* Stored in `data/db/`
 
 Rotating logs (`RotatingFileHandler`) in `data/logs/`:
 
@@ -192,10 +226,19 @@ src/archive_manager/
 
 ## Documentation
 
-- [ARCHITECTURE.md](ARCHITECTURE.md): layer design, DI strategy, errors,
-  persistence decisions
-- [DEVELOPMENT.md](DEVELOPMENT.md): setup, conventions, i18n workflow, patterns
-- [CHANGELOG.md](CHANGELOG.md): release history
+* [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): layer design, DI strategy, errors, persistence decisions
+* [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md): setup, conventions, i18n workflow, patterns
+* [docs/API_GUIDELINES.md](docs/API_GUIDELINES.md): rules and conventions for the REST API
+* [docs/DOMAIN_MAP.md](docs/DOMAIN_MAP.md): modules and exposed interfaces
+* [docs/CORE.md](docs/CORE.md): data models and core interfaces
+* [docs/CONVENTIONS.md](docs/CONVENTIONS.md): naming, language, and architectural patterns
+* [docs/ERRORS.md](docs/ERRORS.md): catalog of domain errors
+* [docs/SECURITY.md](docs/SECURITY.md): security practices and sensitive areas
+* [docs/STATE.md](docs/STATE.md): domain states of entities
+* [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md): external libraries and their usage
+* [docs/TEST_MAP.md](docs/TEST_MAP.md): testing strategy and coverage areas
+* [docs/STATE_MACHINE.md](docs/STATE_MACHINE.md): CLI state machine implementation
+* [CHANGELOG.md](CHANGELOG.md): release history
 
 ## License
 

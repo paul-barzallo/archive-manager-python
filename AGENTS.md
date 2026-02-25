@@ -1,74 +1,101 @@
-# AGENTS.md - Context & Guidelines for Archive Manager
+# AGENTS.md — Central Operating Manual for AI Agents
 
-## Project Overview
+This is the mandatory entry point for any agent working in this repository.
 
-**Archive Manager Python** is a clean architecture-based contact management system. It is designed to be interface-agnostic, currently supporting a CLI adapter and soon to support a REST API adapter.
+## Mission
 
-## Architecture
+Build and evolve `archive-manager-python` as a modular "super organizer" platform, first improving development automation with AI, then embedding AI capabilities into the product.
 
-The project follows **Clean Architecture / Hexagonal Architecture** principles.
+## Rule Priority
 
-### Layers (Inner to Outer)
+Follow rules in this exact order:
 
-1. **Core (Domain)** (`src/archive_manager/core`)
-   * **Entities**: Pure Python objects representing business concepts (e.g., `Contact`).
-   * **Interfaces**: Abstract base classes defining contracts for repositories and services.
-   * **Errors**: Domain-specific exceptions (`AppValidationErrors`).
-   * **No external dependencies** (except standard library).
+1. User explicit request.
+2. This file (`AGENTS.md`).
+3. `agents/reglas/AGENTS.md` + `agents/reglas/always.md` + relevant role file(s).
+4. `agents/workflows/AGENTS.md` + selected workflow file.
+5. `agents/skills/AGENTS.md` + relevant skill file(s).
+6. Core project docs (`README.md`, `docs/ARCHITECTURE.md`, `docs/DEVELOPMENT.md`, `docs/API_GUIDELINES.md`, `docs/DOMAIN_MAP.md`, `docs/CORE.md`, `docs/CONVENTIONS.md`, `docs/ERRORS.md`, `docs/SECURITY.md`, `docs/STATE.md`, `docs/DEPENDENCIES.md`, `docs/TEST_MAP.md`, `docs/STATE_MACHINE.md`, `CHANGELOG.md`).
 
-2. **Application** (`src/archive_manager/application`)
-   * **Services**: Orchestrate business logic (`ContactService`).
-   * **DTOs**: Data Transfer Objects for moving data between layers.
-   * **Policies**: specific business rules.
-   * Depends only on **Core**.
+## Mandatory Rules (Non-negotiable)
 
-3. **Adapters** (`src/archive_manager/adapters`)
-   * **CLI**: Console interface using `rich` and `InquirerPy`.
-   * **API**: REST interface using `FastAPI` and `Uvicorn`.
-   * **Controllers**: Handle input/output for specific interfaces and call Services.
+1. **Do not write code unless the user explicitly asks for code changes.**
+2. Never run `git push` unless explicitly requested by the user.
+3. You must **always** consult and strictly follow the rules defined in `agents/reglas/always.md`. This is mandatory for every task.
+4. Consult `agents/reglas/AGENTS.md` to find specific rules based on your current role or task.
 
-4. **Infrastructure** (`src/archive_manager/infrastructure`)
-   * **Persistence**: Database implementations (SQLAlchemy/SQLite).
-   * **Config**: Settings management (Pydantic Settings).
-   * **Logging**: structured logging configuration.
+## Agent Behavior Contract
 
-## Coding Standards
+### Decision Policy
 
-### Typing
+- If request is ambiguous, ask concise clarifying questions before implementation.
+- If request is informational, provide analysis without code edits.
+- If request explicitly asks implementation, execute end-to-end with validation.
 
-* Use **Type Hints** everywhere.
-* Use `typing.Sequence` for lists/arrays unless `list` specific methods are needed.
-* Use `typing.Self` for factory methods.
-* Avoid `Any` unless absolutely necessary.
+### Scope Control
 
-### Documentation
+- Default to MVP scope.
+- Do not add "nice to have" extras unless explicitly requested.
+- Do not refactor unrelated areas.
 
-* **Google Style Docstrings** are mandatory for all modules, classes, and methods.
-* Include `Args`, `Returns`, and `Raises` sections.
-* File headers should include `#!/usr/bin/env python3`.
+### Communication
 
-### Error Handling
+- Keep progress updates short and action-oriented.
+- State assumptions explicitly.
+- Report what was changed, where, and how it was validated.
 
-* Use custom exceptions from `core.errors`.
-* **Validation**: `AppValidationErrors` for input/logic issues.
-* **Not Found**: Return `None` or raise specific exceptions depending on context (Repo returns `None`, Service might raise).
+## Tooling Protocol
 
-### Pydantic
+### File and Code Operations
 
-* Used for Configuration and DTOs (preferred).
-* Settings are loaded from environment variables or `.env` files.
+- Use repository tools to inspect files before editing.
+- Use patch-based edits for existing files.
+- Prefer targeted reads over broad scans once location is known.
 
-## Development Workflow
+### Verification
 
-* **Testing**: `pytest` for unit and integration tests.
-* **Dependency Management**: `pyproject.toml` (standard PEP 621).
-* **Linter**: `ruff`.
+- Run the narrowest relevant tests first.
+- Expand to broader tests only when needed.
+- Report blockers with concrete evidence.
 
-## Important Files
+### Safety
 
-* `pyproject.toml`: Dependencies and tool config.
-* `src/archive_manager/infrastructure/config/settings.py`: Global settings.
-* `src/archive_manager/application/services/`: Business Logic location.
+- Do not perform destructive operations unless explicitly requested.
+- Do not expose secrets from env/config files.
+
+## Project Context (Quick)
+
+- Architecture style: Clean/Hexagonal.
+- Current mature domain: contacts.
+- Delivery adapters: CLI and API.
+- Expected evolution: module-by-module growth (`tasks`, `events`, `notes`, `projects`, ...), then AI features.
+
+## Agent Docs Map
+
+- Rules (agents): `agents/reglas/AGENTS.md`
+- Workflows (agents): `agents/workflows/AGENTS.md`
+- Skills (agents): `agents/skills/AGENTS.md`
+- Rules (human docs): `agents/reglas/README.md`
+- Workflows (human docs): `agents/workflows/README.md`
+- Skills (human docs): `agents/skills/README.md`
+
+If any file above is missing, create it before relying on it.
+
+## Startup Checklist (for a New Agent with Zero Context)
+
+- [ ] Read this file completely.
+- [ ] Read `agents/reglas/AGENTS.md`, then `agents/reglas/always.md`, then relevant role rule files.
+- [ ] Read `agents/workflows/AGENTS.md` and select one workflow.
+- [ ] Read `agents/skills/AGENTS.md` and relevant skills if needed.
+- [ ] Confirm current project state from `README.md` and the `docs/` directory (e.g., `docs/ARCHITECTURE.md`, `docs/DOMAIN_MAP.md`).
+- [ ] Execute only the scope requested by the user.
+
+## Completion Checklist (before handoff)
+
+- [ ] Request fully addressed.
+- [ ] Scope respected (no extra features).
+- [ ] Relevant validations executed and reported.
+- [ ] Documentation updated when behavior/process changed.
 
 ---
-Created by Copilot Agent - Feb 2026
+Last updated: 2026-02-24
