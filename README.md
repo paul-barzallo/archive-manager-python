@@ -30,11 +30,11 @@ This repository is pioneering an **AI-First Development** approach. We have stru
 This folder contains the "brain" and behavioral constraints for our AI assistants:
 
 * 🚨 **Rules (`agents/reglas/`)**: Strict constraints and guidelines.
-  * *Example:* [`always.md`](agents/reglas/always.md) contains mandatory baseline rules (e.g., "Never run `git push`", "Always run `mypy`").
+  * *Example:* [`always.md`](.agents/reglas/always.md) contains mandatory baseline rules (e.g., "Never run `git push`", "Always run `mypy`").
 * 🔄 **Workflows (`agents/workflows/`)**: Step-by-step standard operating procedures for complex tasks.
-  * *Example:* [`01_feature_delivery_workflow.md`](agents/workflows/01_feature_delivery_workflow.md) guides an agent from planning to testing and documentation.
+  * *Example:* [`01_feature_delivery_workflow.md`](.agents/workflows/01_feature_delivery_workflow.md) guides an agent from planning to testing and documentation.
 * 🧠 **Skills (`agents/skills/`)**: Domain-specific knowledge bases that agents can read to learn how to perform specific technical tasks.
-  * *Example:* [`cloud-functions/SKILL.md`](agents/skills/cloud-functions/SKILL.md) teaches the agent how to handle specific integrations.
+  * *Example:* [`cloud-functions/SKILL.md`](.agents/skills/cloud-functions/SKILL.md) teaches the agent how to handle specific integrations.
 
 ### 📚 The `docs/` Directory (Agent Context)
 
