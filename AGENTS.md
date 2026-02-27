@@ -12,17 +12,17 @@ Follow rules in this exact order:
 
 1. User explicit request.
 2. This file (`AGENTS.md`).
-3. `agents/reglas/AGENTS.md` + `agents/reglas/always.md` + relevant role file(s).
-4. `agents/workflows/AGENTS.md` + selected workflow file.
-5. `agents/skills/AGENTS.md` + relevant skill file(s).
+3. `.agents/reglas/AGENTS.md` + `.agents/reglas/always.md` + relevant role file(s).
+4. `.agents/workflows/AGENTS.md` + selected workflow file.
+5. `.agents/skills/AGENTS.md` + relevant skill file(s).
 6. Core project docs (`README.md`, `docs/ARCHITECTURE.md`, `docs/DEVELOPMENT.md`, `docs/API_GUIDELINES.md`, `docs/DOMAIN_MAP.md`, `docs/CORE.md`, `docs/CONVENTIONS.md`, `docs/ERRORS.md`, `docs/SECURITY.md`, `docs/STATE.md`, `docs/DEPENDENCIES.md`, `docs/TEST_MAP.md`, `docs/STATE_MACHINE.md`, `CHANGELOG.md`).
 
 ## Mandatory Rules (Non-negotiable)
 
 1. **Do not write code unless the user explicitly asks for code changes.**
 2. Never run `git push` unless explicitly requested by the user.
-3. You must **always** consult and strictly follow the rules defined in `agents/reglas/always.md`. This is mandatory for every task.
-4. Consult `agents/reglas/AGENTS.md` to find specific rules based on your current role or task.
+3. You must **always** consult and strictly follow the rules defined in `.agents/reglas/always.md`. This is mandatory for every task.
+4. Consult `.agents/reglas/AGENTS.md` to find specific rules based on your current role or task.
 
 ## Agent Behavior Contract
 
@@ -72,21 +72,21 @@ Follow rules in this exact order:
 
 ## Agent Docs Map
 
-- Rules (agents): `agents/reglas/AGENTS.md`
-- Workflows (agents): `agents/workflows/AGENTS.md`
-- Skills (agents): `agents/skills/AGENTS.md`
-- Rules (human docs): `agents/reglas/README.md`
-- Workflows (human docs): `agents/workflows/README.md`
-- Skills (human docs): `agents/skills/README.md`
+- Rules (agents): `.agents/reglas/AGENTS.md`
+- Workflows (agents): `.agents/workflows/AGENTS.md`
+- Skills (agents): `.agents/skills/AGENTS.md`
+- Rules (human docs): `.agents/reglas/README.md`
+- Workflows (human docs): `.agents/workflows/README.md`
+- Skills (human docs): `.agents/skills/README.md`
 
 If any file above is missing, create it before relying on it.
 
 ## Startup Checklist (for a New Agent with Zero Context)
 
 - [ ] Read this file completely.
-- [ ] Read `agents/reglas/AGENTS.md`, then `agents/reglas/always.md`, then relevant role rule files.
-- [ ] Read `agents/workflows/AGENTS.md` and select one workflow.
-- [ ] Read `agents/skills/AGENTS.md` and relevant skills if needed.
+- [ ] Read `.agents/reglas/AGENTS.md`, then `.agents/reglas/always.md`, then relevant role rule files.
+- [ ] Read `.agents/workflows/AGENTS.md` and select one workflow.
+- [ ] Read `.agents/skills/AGENTS.md` and relevant skills if needed.
 - [ ] Confirm current project state from `README.md` and the `docs/` directory (e.g., `docs/ARCHITECTURE.md`, `docs/DOMAIN_MAP.md`).
 - [ ] Execute only the scope requested by the user.
 

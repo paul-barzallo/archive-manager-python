@@ -11,4 +11,4 @@ This file defines agent behavior for skill documents.
 ## Notes
 
 - `README.md` in this folder is for humans.
-- Rule enforcement remains in `agents/reglas/` and root `AGENTS.md`.
+- Rule enforcement remains in `.agents/reglas/` and root `AGENTS.md`.

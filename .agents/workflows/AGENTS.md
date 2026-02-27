@@ -6,7 +6,7 @@ This file provides agent behavior for workflow documents.
 
 - Select exactly one primary workflow per task.
 - Execute workflow steps in order unless the user explicitly requests a deviation.
-- If a workflow step conflicts with `agents/reglas/always.md`, the rules win.
+- If a workflow step conflicts with `.agents/reglas/always.md`, the rules win.
 
 ## Notes
 
