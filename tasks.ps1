@@ -60,9 +60,28 @@ switch ($Command) {
 
     'check' {
         Write-Header "Running all checks..."
-        & $PSCommandPath format
-        & $PSCommandPath lint
-        & $PSCommandPath test
+
+        if (Test-Command 'ruff') {
+            Write-Host "Checking format..." -ForegroundColor Yellow
+            ruff format --check src/ tests/
+
+            Write-Host "`nRunning ruff..." -ForegroundColor Yellow
+            ruff check src/ tests/
+        } else {
+            Write-Host "ruff not found. Install with: pip install ruff" -ForegroundColor Red
+            exit 1
+        }
+
+        if (Test-Command 'mypy') {
+            Write-Host "`nRunning mypy..." -ForegroundColor Yellow
+            mypy src/
+        } else {
+            Write-Host "mypy not found. Install with: pip install mypy" -ForegroundColor Red
+            exit 1
+        }
+
+        Write-Host "`nRunning tests..." -ForegroundColor Yellow
+        python -m pytest tests/ -v
     }
 
     'clean' {
@@ -92,15 +111,7 @@ switch ($Command) {
 
     'install' {
         Write-Header "Installing dependencies..."
-
-        if (Test-Path 'requirements.txt') {
-            python -m pip install -r requirements.txt
-        }
-
-        python -m pip install -e .
-
-        Write-Host "`nInstalling development dependencies..." -ForegroundColor Yellow
-        python -m pip install pytest ruff mypy pre-commit
+        python -m pip install -e ".[dev]"
 
         Write-Host "`nSetting up pre-commit hooks..." -ForegroundColor Yellow
         if (Test-Command 'pre-commit') {

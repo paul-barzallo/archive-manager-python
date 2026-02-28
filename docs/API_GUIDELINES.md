@@ -2,59 +2,72 @@
 
 ## Overview
 
-We are adding a REST API adapter using **FastAPI** + **Uvicorn**. This adapter will sit alongside the existing CLI adapter, reusing the Application and Core layers.
+The REST API adapter is implemented with **FastAPI** and runs alongside the
+CLI adapter, reusing the same Application and Core layers.
 
-## Architecture Strategy
-
-### 1. Adapter Location
-
-New directory: `src/archive_manager/adapters/api`
-
-Structure:
+## Current Structure
 
 ```text
 adapters/api/
-├── __init__.py
-├── main.py           # FastAPI App definition
-├── deps.py           # Dependency Injection (Database, Services)
-├── routers/          # API Endpoints
-│   ├── __init__.py
-│   └── contacts.py   # Contact endpoints
-└── schemas.py        # Pydantic models (if separate from DTOs)
+|-- __init__.py
+|-- main.py               # FastAPI app factory and uvicorn runner
+|-- deps.py               # Long-lived dependency container
+|-- handlers.py           # Exception handlers
+|-- routers/
+|   |-- __init__.py
+|   `-- contacts.py       # Contact endpoints
+`-- schemas/
+    |-- __init__.py
+    |-- base.py           # Shared response models
+    `-- contacts.py       # Contact request/response models
 ```
 
-### 2. Dependency Injection
+## Dependency Injection
 
-* The existing CLI instantiates services manually.
-* The API will use FastAPI's `Depends` system.
-* `deps.py` will handle opening/closing database sessions and creating Service instances per request.
+- `main.py` creates the `FastAPI` app and configures the lifespan hook.
+- `ApiContainer` in `deps.py` wires `SqliteConnection`,
+  `SqliteContactRepository`, and `ContactService`.
+- The container is stored in `app.state.container` and closed on shutdown.
+- Route handlers obtain the service through `get_contact_service()`.
 
-### 3. Data Transfer
+## Data Contracts
 
-* **Request**: `ContactCreate` (Pydantic model) -> `ContactService`
-* **Response**: `ContactDTO` -> `ContactResponse` (Pydantic model)
-* **Goal**: Minimize duplication. If possible, adapt `ContactDTO` to be Pydantic-compatible or create lightweight wrappers.
+- **Requests** use dedicated Pydantic models from
+  `adapters/api/schemas/contacts.py`.
+- **Responses** adapt application DTOs into API response models.
+- Shared envelopes such as `HealthResponse` and error payloads live in
+  `adapters/api/schemas/base.py`.
 
-### 4. Error Handling
+## Error Handling
 
-* Middleware or centralized exception handler in `main.py`.
-* Map `AppValidationErrors` -> HTTP 400 Bad Request.
-* Map `AppNotFoundError` (if exists) -> HTTP 404 Not Found.
-* Internal errors -> HTTP 500.
+`handlers.py` centralizes exception handling and translates domain errors into
+HTTP responses:
 
-### 5. Configuration
+1. `AppValidationErrors` -> `400 Bad Request`
+2. `AppWarning` -> status from i18n metadata, defaulting to `404 Not Found`
+3. `AppError` -> status from i18n metadata, defaulting to `409 Conflict`
+4. `AppInfrastructureError` -> status from i18n metadata, defaulting to
+   `500 Internal Server Error`
 
-* Add `APISettings` to `src/archive_manager/infrastructure/config/settings.py`.
-* Defaults: Host `127.0.0.1`, Port `8000`.
+Messages are localized using the `Accept-Language` header.
 
-## Implementation Steps
+## Configuration
 
-1. **Settings**: Update `settings.py`.
-2. **Dependencies**: Create `adapters/api/deps.py` for DB session handling.
-3. **Router**: Create `adapters/api/routers/contacts.py` implementing CRUD using `ContactService`.
-4. **App**: Create `adapters/api/main.py` assembling the app.
-5. **Entry Point**: Add `archive-api` script to `pyproject.toml`.
+- API settings live in `src/archive_manager/infrastructure/config/settings.py`
+  under `ApiSettings`.
+- Defaults are:
+  - Host: `127.0.0.1`
+  - Port: `8000`
+  - Reload: `false`
+- Runtime entry point: `archive-manager api`
+
+## Validation
+
+- API-specific tests live in `tests/unit/api/`.
+- API checks run in `.github/workflows/api-ci.yaml`.
 
 ## Context Links
 
-* [Service Reference](../src/archive_manager/application/services/contact_service.py) - The business logic we are wrapping.
+- [Contact service](../src/archive_manager/application/services/contact_service.py)
+- [API app factory](../src/archive_manager/adapters/api/main.py)
+- [API handlers](../src/archive_manager/adapters/api/handlers.py)

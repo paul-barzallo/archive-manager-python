@@ -33,13 +33,13 @@ The core interfaces define the contracts that outer layers (Application, Infrast
 
 ### `Repository`
 
-* **Description**: A generic protocol for data access operations.
-* **Responsibilities**: Defines standard CRUD methods (`add`, `get`, `update`, `delete`, `list`) that any repository implementation must provide.
+* **Description**: A marker protocol for repository abstractions.
+* **Responsibilities**: Keeps layer boundaries explicit. Concrete repository protocols define domain-specific operations.
 
 ### `ContactRepository`
 
 * **Description**: A specific repository interface for the `Contact` entity.
-* **Responsibilities**: Extends the generic `Repository` with contact-specific queries, such as finding by email or canonical phone number.
+* **Responsibilities**: Defines contact CRUD and search operations such as `add`, `get`, `update`, `delete`, `list_all`, `find_by_email`, and `find_by_phone`.
 
 ### `Service`
 

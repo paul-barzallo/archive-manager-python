@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import locale
 import logging
+import os
 import sys
 from collections.abc import Sequence
 from pathlib import Path
@@ -251,7 +252,7 @@ class Settings(BaseSettings):
     )
 
     app_name: str = Field(default="archive-manager")
-    version: str = Field(default="0.1.0")
+    version: str = Field(default="0.1.1")
     debug: bool = Field(default=False)
     environment: Literal["development", "testing", "production"] = Field(
         default="development"
@@ -266,11 +267,12 @@ class Settings(BaseSettings):
         """Initialize settings from config files, env vars, and kwargs.
 
         Configuration precedence (highest to lowest):
-        1. kwargs (programmatic overrides)
-        2. Environment variables / .env file (APP_ prefix)
-        3. config.{environment}.yaml (environment-specific)
-        4. config.yaml (base configuration)
-        5. Field defaults
+        1. ``--debug`` CLI flag
+        2. kwargs (programmatic overrides)
+        3. Environment variables / .env file (APP_ prefix)
+        4. config.{environment}.yaml (environment-specific)
+        5. config.yaml (base configuration)
+        6. Field defaults
 
         Args:
             **kwargs: Override values (take precedence over config files).
@@ -279,20 +281,26 @@ class Settings(BaseSettings):
         if cli_debug:
             kwargs["debug"] = True
 
-        # Load base config.yaml
         yaml_config = self._load_yaml(_CONFIG_FILE)
-
-        # Get environment from kwargs or base config
-        environment = kwargs.get("environment") or yaml_config.get(
-            "environment", "development"
+        dotenv_config = self._load_app_env(_ENV_FILE)
+        os_env_config = self._parse_env_mapping(
+            {key: value for key, value in os.environ.items() if key.startswith("APP_")}
         )
 
-        # Load environment-specific config
-        env_config_file = _PROJECT_DIR / f"config.{environment}.yaml"
-        env_config = self._load_yaml(env_config_file)
+        environment = (
+            cast(str | None, kwargs.get("environment"))
+            or cast(str | None, os_env_config.get("environment"))
+            or cast(str | None, dotenv_config.get("environment"))
+            or cast(str | None, yaml_config.get("environment"))
+            or "development"
+        )
 
-        # Merge: base config < env config < kwargs
-        merged = self._deep_merge(yaml_config, env_config)
+        env_config_file = _PROJECT_DIR / f"config.{environment}.yaml"
+        env_yaml_config = self._load_yaml(env_config_file)
+
+        merged = self._deep_merge(yaml_config, env_yaml_config)
+        merged = self._deep_merge(merged, dotenv_config)
+        merged = self._deep_merge(merged, os_env_config)
         merged = self._deep_merge(merged, kwargs)
 
         super().__init__(**merged)
@@ -339,6 +347,63 @@ class Settings(BaseSettings):
             else:
                 result[key] = value
         return result
+
+    @classmethod
+    def _parse_env_mapping(
+        cls, values: dict[str, str] | os._Environ[str]
+    ) -> dict[str, Any]:
+        """Parse ``APP_``-prefixed environment values into nested settings data.
+
+        Args:
+            values: Raw environment-style mapping.
+
+        Returns:
+            Nested dictionary compatible with the settings model.
+        """
+        parsed: dict[str, Any] = {}
+
+        for key, value in values.items():
+            if not key.startswith("APP_"):
+                continue
+
+            parts = key.removeprefix("APP_").lower().split("__")
+            current = parsed
+
+            for part in parts[:-1]:
+                current = cast(dict[str, Any], current.setdefault(part, {}))
+
+            current[parts[-1]] = value
+
+        return parsed
+
+    @classmethod
+    def _load_app_env(cls, env_path: Path) -> dict[str, Any]:
+        """Load ``APP_`` values from a local ``.env`` file.
+
+        Args:
+            env_path: Path to the ``.env`` file.
+
+        Returns:
+            Nested dictionary with parsed ``APP_`` values.
+        """
+        if not env_path.exists():
+            return {}
+
+        raw: dict[str, str] = {}
+        with Path.open(env_path, encoding="utf-8") as env_file:
+            for line in env_file:
+                text = line.strip()
+                if not text or text.startswith("#") or "=" not in text:
+                    continue
+
+                key, value = text.split("=", 1)
+                key = key.strip()
+                value = value.strip()
+                if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+                    value = value[1:-1]
+                raw[key] = value
+
+        return cls._parse_env_mapping(raw)
 
     def model_post_init(self, __context: Any) -> None:
         """Post-initialization to configure logging."""

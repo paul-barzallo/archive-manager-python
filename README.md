@@ -102,10 +102,11 @@ archive-manager
 API options:
 
 ```bash
-archive-manager api --host 0.0.0.0 --port 3000 --reload
+archive-manager api --host 0.0.0.0 --port 8000 --reload
 ```
 
-Open interactive API docs at `http://127.0.0.1:8000/docs`.
+Open interactive API docs at `http://127.0.0.1:8000/docs` when using the
+default port.
 
 ## Configuration
 
@@ -189,16 +190,14 @@ Windows task runner:
 
 ## Continuous Integration
 
-Pushes and pull requests to `main` or `develop` run
-`.github/workflows/ci.yaml` with:
+Pushes and pull requests to `main` or `develop` run two GitHub Actions
+workflows:
 
-1. Lint (Ruff format + lint checks)
-2. Type check (mypy)
-3. Tests (Ubuntu and Windows, Python 3.11 and 3.12)
-4. Coverage artifact upload
+1. `.github/workflows/ci.yaml` for CLI/core checks:
+   lint, mypy, CLI/integration tests, and coverage artifact upload.
+2. `.github/workflows/api-ci.yaml` for API unit tests on Python 3.11 and 3.12.
 
-The test stage depends on lint and type-checking. All checks must pass before
-merge.
+All checks must pass before merge.
 
 ## Project Layout
 

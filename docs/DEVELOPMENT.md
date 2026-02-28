@@ -85,13 +85,11 @@ pre-commit run --all-files
 
 ## Continuous Integration
 
-The CI pipeline (`.github/workflows/ci.yaml`) runs on every push and
-pull request to `main` or `develop`:
+Pushes and pull requests to `main` or `develop` run two workflows:
 
-1. **Lint**: Ruff format and lint checks (must pass first).
-2. **Type check**: mypy static analysis.
-3. **Test**: Full test suite on Python 3.11 and 3.12.
-4. **Coverage**: Report uploaded as artifact on 3.11.
+1. **`.github/workflows/ci.yaml`**: Ruff format/lint checks, mypy, CLI and
+   integration tests, plus coverage artifact upload on Python 3.11.
+2. **`.github/workflows/api-ci.yaml`**: API unit tests on Python 3.11 and 3.12.
 
 All checks must pass before a pull request can be merged.
 
@@ -115,6 +113,9 @@ Workflow: `feature/*` -> `develop` (via PR with CI) -> `main` (release).
 .\tasks.ps1 clean
 .\tasks.ps1 install
 ```
+
+`check` is non-destructive: it verifies formatting, linting, typing, and tests
+without rewriting files.
 
 ## Import Rules
 

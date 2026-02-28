@@ -12,7 +12,7 @@ These rules are always active for every agent and every task.
 8. When behavior or process changes, update the relevant documentation.
 9. When implementing new functionality, add new tests for it.
 10. Validate affected behavior before handoff.
-11. Always run `npx markdownlint-cli <file> --disable MD013` when modifying or creating Markdown files.
+11. When available locally, run `npx markdownlint-cli <file> --disable MD013` when modifying or creating Markdown files; if it is unavailable, report the blocker.
 12. Always run `ruff check <file> --fix` and `ruff format <file>` when modifying or creating Python code.
 13. Always run `mypy <file>` when modifying or creating Python code to enforce static typing.
 

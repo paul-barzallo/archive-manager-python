@@ -10,7 +10,7 @@ The CLI state machine is located in `src/archive_manager/adapters/cli/states/`. 
 
 * **Description**: An abstract base class that all concrete states must inherit from.
 * **Responsibilities**:
-  * Provides a common interface for executing state logic (`execute()`).
+  * Provides a common interface for executing state logic (`run()`).
   * Includes a `@handle_errors` decorator to catch and handle application-specific exceptions (`AppException`) gracefully, displaying appropriate messages to the user.
 
 ### Concrete States
@@ -22,7 +22,7 @@ Concrete states implement the specific logic for each screen or action. Examples
 
 ### State Transitions
 
-State transitions occur by returning the next state instance from the `execute()` method.
+State transitions occur by returning the next state instance from the `run()` method.
 
 * **Next State**: If a state returns another state instance, the CLI loop continues with the new state.
 * **Exit**: If a state returns `None`, the CLI loop terminates, and the application exits.

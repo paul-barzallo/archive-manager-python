@@ -82,7 +82,7 @@ Depends only on `core/`.
 
 ### 4. Adapters (`adapters/`)
 
-Delivery mechanisms. Currently provides a CLI adapter.
+Delivery mechanisms. The project currently provides CLI and API adapters.
 
 - **`cli/`**
   - `main.py`: CLI composition root and dependency wiring.
@@ -92,6 +92,12 @@ Delivery mechanisms. Currently provides a CLI adapter.
   - `ui/CslUI`: Rich-based console UI (menus, tables, prompts).
   - `ui/ContactCslUI`: Contact-specific UI with paginated table footer and
     list navigation actions.
+- **`api/`**
+  - `main.py`: FastAPI application factory and ASGI server entry point.
+  - `deps.py`: Dependency container and request-level accessors.
+  - `handlers.py`: Exception-to-HTTP translation with i18n-aware payloads.
+  - `routers/contacts.py`: Contact endpoints.
+  - `schemas/`: Response and request models for API contracts.
 
 ## Entity Factory Pattern
 
@@ -122,8 +128,10 @@ Validation is enforced at three levels:
 
 ## Dependency Injection
 
-`Settings` is created once in `adapters/cli/main.py` and passed to every
-component that requires configuration. There is no global singleton.
+`Settings` is created in each adapter composition root
+(`adapters/cli/main.py` and `adapters/api/main.py`) and passed to the
+components that require configuration. There is no global singleton.
+The following diagram shows the CLI wiring.
 
 ```text
 adapters/cli/main.py

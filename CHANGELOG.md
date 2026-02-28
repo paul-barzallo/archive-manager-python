@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Configuration precedence fix**: `Settings` now applies `config.yaml` and
+  `config.{environment}.yaml` as defaults only, preserving higher-priority
+  values from environment variables, `.env`, CLI debug flag, and init kwargs.
+- **Version alignment**: project metadata, runtime settings, and base config
+  are aligned at `0.1.1`.
+- **Task runner safety**: `tasks.ps1 check` now performs non-destructive
+  verification (`ruff format --check`, `ruff check`, `mypy`, `pytest`) instead
+  of rewriting files, and `tasks.ps1 install` now installs `.[dev]`.
+- **Documentation refresh**: `README.md`, architecture docs, API guidelines,
+  and supporting docs now reflect the current API adapter, CI split, repository
+  contracts, soft-delete lifecycle, and workflow naming.
+- **Workflow cleanup**: removed the duplicate numbered workflow file so
+  `.agents/workflows/` keeps only canonical non-numbered workflow names.
+
 ## [0.1.1] - 2026-02-17
 
 ### Added

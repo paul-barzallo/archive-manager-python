@@ -21,7 +21,7 @@ The `contacts` module is currently the most mature domain in the application. It
   * **Responsibilities**:
     * Abstracting the underlying database (e.g., SQLite, PostgreSQL).
     * Executing CRUD and search queries specific to contacts.
-  * **Location**: `src/archive_manager/core/interfaces/repository.py`
+  * **Location**: `src/archive_manager/core/interfaces/contact_repository.py`
 
 ## Future Modules (Planned)
 

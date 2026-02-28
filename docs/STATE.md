@@ -26,8 +26,11 @@ The state transitions of an entity are implicit and occur through the factory me
 2. **Persisted**: The entity is saved to the database.
 3. **Reconstructed**: The entity is retrieved from the database using `from_persistence()`.
 4. **Updated**: The entity is modified and saved back to the database.
-5. **Deleted**: The entity is removed from the database.
+5. **Deleted**: The entity is soft-deleted (`deleted_at` is set) and excluded
+   from active queries.
 
 ## State Management
 
-The application relies on the database to manage the state of entities. The `ContactRepository` interface defines the methods for interacting with the database, such as `add`, `get`, `update`, and `delete`.
+The application relies on the database to manage the state of entities. The
+`ContactRepository` interface defines the methods for interacting with the
+database, such as `add`, `get`, `update`, `delete`, and `list_all`.

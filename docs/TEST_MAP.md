@@ -42,7 +42,8 @@ The test suite covers various areas of the application, ensuring comprehensive t
 * **`cli/`**: Tests for CLI commands, argument parsing, and user interaction.
 * **`entities/`**: Tests for domain entities, field validation, and factory methods.
 * **`i18n/`**: Tests for internationalization resources, translation functions, and language fallback.
-* **`imports/`**: Tests for importing data from external sources (e.g., CSV, JSON).
+* **`imports/`**: Tests for package import integrity, dependency availability,
+  and circular-import regressions.
 * **`repositories/`**: Tests for database repositories, CRUD operations, and custom queries.
 * **`services/`**: Tests for domain services, business logic, and orchestration.
 * **`states/`**: Tests for CLI state machine states, transitions, and error handling.
